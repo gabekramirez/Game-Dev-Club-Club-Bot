@@ -43,7 +43,8 @@ export async function handleDiscordRequest(request: Request, env: Env, ctx: Exec
                 case "getfirstcell": {
                     ctx.waitUntil((async () => {
                         try {
-                            const value = await getFirstCell(env);
+                            const value = "test";
+                            if (value instanceof Response) throw new Error();
                             await sendMessage(value, env, interaction);
                         } catch (err) {
                             await sendMessage("Unable to fetch information from Google Sheets.", env, interaction);
