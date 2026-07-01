@@ -1,4 +1,5 @@
 import { verifyKey } from "discord-interactions";
+import { getFirstCell } from "./sheets.ts";
 
 
 async function verify(request: Request, env: Env): Promise<boolean> {
@@ -28,7 +29,7 @@ export async function handleDiscordRequest(request: Request, env: Env, ctx: Exec
         }
         const interaction = await request.json();
         if (interaction.type === 1) {
-            return Response.json({ type: 1 });
+            return Response.json({type: 1});
         }
 
 
@@ -38,6 +39,19 @@ export async function handleDiscordRequest(request: Request, env: Env, ctx: Exec
             const name = interaction.data?.name;
 
             switch (name) {
+
+                case "getfirstcell": {
+                    ctx.waitUntil((async () => {
+                        try {
+                            const value = await getFirstCell(env);
+                            if (value instanceof Response) throw new Error();
+                            await sendMessage(value, env, interaction);
+                        } catch (err) {
+                            await sendMessage("Unable to fetch information from Google Sheets.", env, interaction);
+                        }
+                    })());
+                    return Response.json({type: 5});
+                }
 
                 default: {
                     return Response.json({type: 4, data: {content: `Unknown command: /${name}`}});
