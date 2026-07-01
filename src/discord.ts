@@ -43,7 +43,7 @@ export async function handleDiscordRequest(request: Request, env: Env, ctx: Exec
                 case "getfirstcell": {
                     ctx.waitUntil((async () => {
                         try {
-                            const value = "test";
+                            const value = await getFirstCell(env);
                             if (value instanceof Response) throw new Error();
                             await sendMessage(value, env, interaction);
                         } catch (err) {
