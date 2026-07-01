@@ -8,7 +8,33 @@ const envPath = path.resolve(
   isProd ? ".prod.vars" : ".dev.vars"
 );
 
-// loads env last and overwrite everything
-dotenv.config({path: envPath, override: true});
+const result = dotenv.config({
+  path: envPath,
+  override: true,
+});
 
-export const env = process.env;
+if (result.error) {
+  throw new Error(`Failed to load env file: ${envPath}`);
+}
+
+if (!result.parsed) {
+  throw new Error(`Env file parsed empty: ${envPath}`);
+}
+
+/**
+ * 🚨 IMPORTANT: DO NOT use process.env at all
+ */
+const envRaw = result.parsed;
+
+export const env = {
+  ENVIRONMENT: envRaw.ENVIRONMENT!,
+  DISCORD_TOKEN: envRaw.DISCORD_TOKEN!,
+  DISCORD_APPLICATION_ID: envRaw.DISCORD_APPLICATION_ID!,
+  CLIENT_ID: envRaw.CLIENT_ID!,
+  GUILD_ID: envRaw.GUILD_ID!,
+  DISCORD_PUBLIC_KEY: envRaw.DISCORD_PUBLIC_KEY!,
+};
+
+console.log("USING ENV FILE:", envPath);
+console.log("APP ID:", env.DISCORD_APPLICATION_ID);
+console.log("TOKEN START:", env.DISCORD_TOKEN.slice(0, 10));

@@ -70,7 +70,7 @@ npm run register
 
 For production use:
 ```shell
-npm run register --prod
+node --import tsx scripts/register-discord-bot.ts --prod
 ```
 
 
