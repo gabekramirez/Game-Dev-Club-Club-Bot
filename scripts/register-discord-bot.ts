@@ -1,4 +1,4 @@
-import fetch from 'node-fetch';
+import { env } from "./env.ts";
 
 /**
  * This file is meant to be run from the command line, and is not used by the
@@ -13,7 +13,7 @@ import fetch from 'node-fetch';
 // SLASH COMMMANDS
 const GET_FIRST_CELL_COMMAND = {
   name: "getfirstcell",
-  description: "Shows the value of Sheet1!A1",
+  description: "TESTING123Shows the value of Sheet1!A1",
 };
 const ALL_COMMANDS = [GET_FIRST_CELL_COMMAND];
 
@@ -21,8 +21,8 @@ const ALL_COMMANDS = [GET_FIRST_CELL_COMMAND];
 
 
 
-const token = process.env.DISCORD_TOKEN;
-const applicationId = process.env.DISCORD_APPLICATION_ID;
+const token = env.DISCORD_TOKEN;
+const applicationId = env.DISCORD_APPLICATION_ID;
 
 if (!token) {
   throw new Error('The DISCORD_TOKEN environment variable is required.');
@@ -42,7 +42,7 @@ async function registerGlobalCommands() {
   await registerCommands(url);
 }
 
-async function registerCommands(url) {
+async function registerCommands(url: string) {
   const response = await fetch(url, {
     headers: {
       'Content-Type': 'application/json',
@@ -66,7 +66,4 @@ async function main() {
   await registerGlobalCommands();
 }
 
-main().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
+main().catch(console.error);

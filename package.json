@@ -2,6 +2,7 @@
     "name": "game-dev-club-club-bot",
     "private": true,
     "scripts": {
+        
         "dev": "wrangler dev",
         "deploy": "wrangler deploy",
         "register": "tsx scripts/register-discord-bot.ts"
@@ -12,7 +13,6 @@
     },
     "dependencies": {
         "discord-interactions": "^4.4.0",
-        "dotenv": "^17.4.2",
-        "node-fetch": "^3.3.2"
+        "dotenv": "^17.4.2"
     }
 }
