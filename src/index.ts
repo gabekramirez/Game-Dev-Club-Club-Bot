@@ -11,7 +11,7 @@ export default {
             case "POST /discord": return handleDiscordRequest(request, env, ctx);
             default: {
                 const value = await getFirstCell(env);
-                return new Response(value, {status: 404});
+                return new Response(JSON.stringify(value), {status: 404});
             }
         }
     }

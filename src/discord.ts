@@ -40,7 +40,7 @@ export async function handleDiscordRequest(request: Request, env: Env, ctx: Exec
             switch (name) {
 
                 default: {
-                    return Response.json({type: 5, data: {content: `Unknown command: /${name}`}});
+                    return Response.json({type: 4, data: {content: `Unknown command: /${name}`}});
                 }
 
             }
@@ -48,8 +48,8 @@ export async function handleDiscordRequest(request: Request, env: Env, ctx: Exec
 
 
 
-        return Response.json({type: 5, data: {content: "Unsupported interaction type."}});
+        return Response.json({type: 4, data: {content: "Unsupported interaction type."}});
     } catch (err) {
-        return Response.json({type: 5, data: {content: "Bot error: " + String(err)}});
+        return Response.json({type: 4, data: {content: "Bot error: " + String(err)}});
     }
 }

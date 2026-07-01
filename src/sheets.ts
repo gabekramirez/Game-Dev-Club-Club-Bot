@@ -1,7 +1,7 @@
 import GoogleAuth, { GoogleKey } from './google-auth.ts';
 
 
-export async function getFirstCell(env: Env): Promise<string> {
+export async function getFirstCell(env: Env): Promise<string | Response> {
     // Parse the JSON GCP_SERVICE_ACCOUNT secret key
     const googleAuth: GoogleKey = JSON.parse(env.GCP_SERVICE_ACCOUNT);
 
