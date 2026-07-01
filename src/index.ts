@@ -9,7 +9,10 @@ export default {
         switch (`${request.method} ${url.pathname}`) {
             case "GET /health": return new Response("OK");
             case "POST /discord": return handleDiscordRequest(request, env, ctx);
-            default: return new Response(await getFirstCell(env), {status: 404});
+            default: {
+                const value = await getFirstCell(env);
+                return new Response(value, {status: 404});
+            }
         }
     }
 };

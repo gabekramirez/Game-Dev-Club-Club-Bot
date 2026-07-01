@@ -1,5 +1,5 @@
 {
-    "name": "bottest",
+    "name": "game-dev-club-club-bot",
     "private": true,
     "scripts": {
         "dev": "wrangler dev",
