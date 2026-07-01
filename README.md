@@ -46,6 +46,7 @@ npm run register
 
 ## USEFUL RESOURCES
 
+- GOOGLE SHEETS API ACCOUNT: https://www.datacamp.com/tutorial/google-sheets-api
 - GOOGLE SHEETS API: https://medium.com/@tamnvhustcc/how-to-authenticate-google-apis-on-cloudflare-workers-in-2025-a-complete-guide-with-custom-jwt-80614398425a
 - DISCORD BOT SETUP: https://docs.discord.com/developers/tutorials/hosting-on-cloudflare-workers?EwVcT9cY=9Ur0EzgkC
 - DISCORD BOT RESPONSE: https://docs.discord.com/developers/interactions/receiving-and-responding
