@@ -13,7 +13,7 @@ import { env } from "./env.ts";
 // SLASH COMMMANDS
 const GET_FIRST_CELL_COMMAND = {
   name: "getfirstcell",
-  description: "TESTING123Shows the value of Sheet1!A1",
+  description: "Shows the value of Sheet1!A1",
 };
 const ALL_COMMANDS = [GET_FIRST_CELL_COMMAND];
 
