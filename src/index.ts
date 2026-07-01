@@ -1,4 +1,5 @@
 import { handleDiscordRequest } from "./discord.ts";
+import { getFirstCell } from "./sheets.ts";
 
 
 export default {
@@ -8,7 +9,7 @@ export default {
         switch (`${request.method} ${url.pathname}`) {
             case "GET /health": return new Response("OK");
             case "POST /discord": return handleDiscordRequest(request, env, ctx);
-            default: return new Response("NOT FOUND", {status: 404});
+            default: return new Response(await getFirstCell(env), {status: 404});
         }
     }
 };
