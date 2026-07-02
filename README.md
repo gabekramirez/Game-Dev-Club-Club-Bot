@@ -51,7 +51,7 @@ cloudflared tunnel --url http://localhost:8787
 ```
 
 NOTE: This next step can be pretty finicky.
-If you keep getting `"Validation errors: interactions_endpoint_url: The specified interactions endpoint url could not be verified."` then close all of your terminals and start over from "Run the bot in your local repository"
+If you keep getting `Validation errors: interactions_endpoint_url: The specified interactions endpoint url could not be verified.` then close all of your terminals and start over from "Run the bot in your local repository"
 
 - Copy the URL under "Your quick Tunnel has been created!" into "Interactions Endpoint URL"
 
