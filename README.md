@@ -27,7 +27,7 @@ cd Game-Dev-Club-Club-Bot
 npm install
 ```
 
-### STEP 2: Run the bot in development
+### STEP 2: Create Cloudflare Worker
 
 Authorize Wrangler:
 ```shell
@@ -39,13 +39,16 @@ Deploy the bot:
 npx wrangler deploy --env dev
 ```
 
-### STEP 3: Create your own Discord bot to test changes on
+### STEP 3: Create Discord bot
 
 - Make a test server on [Discord](https://discord.com) to test your bot on
 - Go to [Discord Developer Portal](https://discord.com/developers/applications)
 - Click on "New Application"
 - Name it something like "Dev GDCC Bot"
 - Click on "Create"
+
+### STEP 4: Set up bot
+
 - In a new tab go to [Cloudflare](https://dash.cloudflare.com)
 - Click on "dev-gdcc-bot" in "Workers and Pages"
 - Click on "Settings"
@@ -70,10 +73,12 @@ Text    GOOGLE_SHEET_ID
 - Copy "Client Secret" into "DISCORD_TOKEN"
 - Copy the Google API token that I gave you at the start into "GCP_SERVICE_ACCOUNT"
 - Copy the Schools List Google Sheet's ID into "GOOGLE_SHEET_ID" (part of the URL after "spreadsheets/d/" and before the next "/" after that)
-
-- Copy the https URL that it gives you
-- Go back to "General Information" in the [Discord Developer Portal](https://discord.com/developers/applications) and scroll down to "Interactions Endpoint URL"
-- Paste in the https URL and type "/discord" after it
+- Click on "Deploy"
+- Click on "Visit"
+- Copy the URL at the top
+- Go back to "General Information" in the [Discord Developer Portal](https://discord.com/developers/applications)
+- Scroll down to "Interactions Endpoint URL"
+- Paste in the URL that you copied earlier and type "/discord" after it
 - Click "Save Changes"
 - Go back to "Oath2"
 - Under Scopes checkmark "Bot" and "applications.commands"
@@ -82,7 +87,7 @@ Text    GOOGLE_SHEET_ID
 - Open it in your web browser
 - Add the Discord bot to your test server
 
-### STEP 4: Register the Discord bot's slash commands
+### STEP 5: Register the Discord bot's slash commands
 
 Lastly, in your local repository run the following
 ```shell
