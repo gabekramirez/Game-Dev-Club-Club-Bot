@@ -60,7 +60,9 @@ If you keep getting `Validation errors: interactions_endpoint_url: The specified
 - Go back to "Oath2"
 - Under Scopes checkmark "Bot" and "applications.commands"
 - Under Bot Permissions checkmark "Manage Roles", "Ban Members", and "Send Messages"
-- Copy the "Generated URL" at the bottom, open it in your web browser, and add the Discord bot to your test server
+- Copy the "Generated URL" at the bottom
+- Open it in your web browser
+- Add the Discord bot to your test server
 
 NOTE: you will have to generate a new URL every time you want to test your bot
 
