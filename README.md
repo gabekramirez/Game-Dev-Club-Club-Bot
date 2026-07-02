@@ -68,7 +68,7 @@ close all of your terminals and start over from "Run the bot in your local repos
 
 NOTE: you will have to generate a new URL every time you want to test your bot
 
-Lastly run the following to register the Discord bot's slash commands:
+Lastly open a third terminal and run the following in your local repository to register the Discord bot's slash commands:
 ```shell
 npm run register
 ```
