@@ -68,9 +68,10 @@ Text    GOOGLE_SHEET_ID
 - Next copy the following values from the Discord Developer Portal into the variables you just made
 - Copy "Application ID" into "DISCORD_APPLICATION_ID"
 - Copy "Public Key" into "DISCORD_PUBLIC_KEY"
-- Go to "OAuth2" and click on "Reset Secret"
+- Go to "Bot" and click on "Reset Token"
 - Confirm
-- Copy "Client Secret" into "DISCORD_TOKEN"
+- Copy into "DISCORD_TOKEN"
+- Save this Discord bot token somewhere safe and private where you won't lose it (NOT THE REPO)
 - Copy the Google API token that I gave you at the start into "GCP_SERVICE_ACCOUNT"
 - Copy the Schools List Google Sheet's ID into "GOOGLE_SHEET_ID" (part of the URL after "spreadsheets/d/" and before the next "/" after that)
 - Click on "Deploy"
@@ -89,10 +90,21 @@ Text    GOOGLE_SHEET_ID
 
 ### STEP 5: Register the Discord bot's slash commands
 
-Lastly, in your local repository run the following
+Windows:
 ```shell
-npm run register
+set DISCORD_TOKEN=your_token_here
+set DISCORD_APPLICATION_ID=your_application_id_here
+npx tsx scripts/register-discord-bot.ts
 ```
+
+Mac/Linux:
+```shell
+DISCORD_TOKEN="your_token_here" \
+DISCORD_APPLICATION_ID="your_application_id_here" \
+npx tsx scripts/register-discord-bot.ts
+```
+
+NOTE: You will have to redo this last step whenever you edit this file to register the slash commands
 
 
 ## For those new to GitHub
@@ -122,19 +134,6 @@ git push origin your-branch-name
 ```
 
 Open a pull request on [GitHub](https://github.com/gabekramirez/Game-Dev-Club-Club-Bot/compare) to request that I add your changes when you're done.
-
-
-## Must be ran after editing slash commands to reregister them
-
-For development use:
-```shell
-npm run register
-```
-
-For production use (likely only going to be used by me):
-```shell
-node --import tsx scripts/register-discord-bot.ts --prod
-```
 
 
 ## USEFUL RESOURCES
