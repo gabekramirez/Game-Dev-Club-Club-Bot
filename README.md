@@ -6,7 +6,7 @@ Discord Bot for the Game Dev Club Club (GDCC - A club of game dev clubs).
 - [Development Setup](#development-setup)
 - [For those new to GitHub](#for-those-new-to-github)
 - [Must be ran after editing slash commands to reregister them](#must-be-ran-after-editing-slash-commands-to-reregister-them)
-- [USEFUL RESOURCES](useful-resources)
+- [USEFUL RESOURCES](#useful-resources)
 
 
 ## Development Setup
