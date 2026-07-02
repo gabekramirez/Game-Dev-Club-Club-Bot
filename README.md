@@ -17,13 +17,14 @@ Create your own Discord bot to test changes on:
 - Make a test server on [Discord](https://discord.com) to test your bot on
 - Go to [Discord Developer Portal](https://discord.com/developers/applications)
 - Click on "New Application"
-- Put "Dev Game Dev Club Club Bot" or whatever you want as the "Name"
+- Put "Dev Game Dev Club Club Bot" or whatever you want as the name
 - Click on "Create"
-- Copy "Application ID" into ["DISCORD_APPLICATION_ID"](/.dev.vars)
-- Copy "Public Key" into ["DISCORD_PUBLIC_KEY"](/.dev.vars)
+- Open the [.dev.vars](/.dev.vars) file
+- Copy "Application ID" into "DISCORD_APPLICATION_ID"
+- Copy "Public Key" into "DISCORD_PUBLIC_KEY"
 - Go to "OAuth2" and click on "Reset Secret"
 - Confirm
-- Copy "Client Secret" into ["DISCORD_TOKEN"](/.dev.vars)
+- Copy "Client Secret" into "DISCORD_TOKEN"
 - Go back to "General Information" and scroll down to "Interactions Endpoint URL"
 
 Run the bot:
