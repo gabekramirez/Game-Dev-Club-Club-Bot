@@ -91,18 +91,8 @@ Text    GOOGLE_SHEET_ID
 
 ### STEP 5: Register the Discord Bot's slash commands
 
-Windows:
 ```shell
-set DISCORD_TOKEN=your_token_here
-set DISCORD_APPLICATION_ID=your_application_id_here
-npx tsx scripts/register-discord-bot.ts
-```
-
-Mac/Linux:
-```shell
-DISCORD_TOKEN="your_token_here" \
-DISCORD_APPLICATION_ID="your_application_id_here" \
-npx tsx scripts/register-discord-bot.ts
+npx tsx scripts/register-discord-bot.ts YourDiscordBotApplicationIDHere YourDiscordBotTokenHere
 ```
 
 NOTE: You will have to redo this last step whenever you edit this file to register the slash commands

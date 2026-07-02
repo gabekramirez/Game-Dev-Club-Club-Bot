@@ -10,8 +10,8 @@ const SLASH_COMMANDS = [
 
 
 async function main() {
-  const token = process.env.DISCORD_TOKEN;
-  const applicationId = process.env.DISCORD_APPLICATION_ID;
+  const applicationId = process.argv[2];
+  const token = process.argv[3];
 
   if (!token) throw new Error("Missing DISCORD_TOKEN");
   if (!applicationId) throw new Error("Missing DISCORD_APPLICATION_ID");
