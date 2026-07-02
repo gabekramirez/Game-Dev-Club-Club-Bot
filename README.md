@@ -11,22 +11,26 @@ Discord Bot for the Game Dev Club Club (GDCC - A club of game dev clubs).
 
 ## Development Setup
 
-Before following Development Setup, send me (@ninwu) a DM on Discord about wanting to contribute and I will give you the Google API token.
+### STEP 0: Before following Development Setup
 
-INSTALL REQUIRED SOFTWARE: [git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) [npm](https://docs.npmjs.com/cli/v9/configuring-npm/install) [cloudflared](https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/downloads/)
+- Send me (@ninwu) a DM on Discord about wanting to contribute and I will give you the Google API token.
+- Install the required software: [git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) [npm](https://docs.npmjs.com/cli/v9/configuring-npm/install)
+- Create a [Cloudflare](https://dash.cloudflare.com/login) account and login to it
 
-Clone the GitHub repo:
+### STEP 1: Clone the GitHub repo
+
 ```shell
 git clone https://github.com/gabekramirez/Game-Dev-Club-Club-Bot
 cd Game-Dev-Club-Club-Bot
 npm install
 ```
 
-Create your own Discord bot to test changes on:
+### STEP 2: Create your own Discord bot to test changes on
+
 - Make a test server on [Discord](https://discord.com) to test your bot on
 - Go to [Discord Developer Portal](https://discord.com/developers/applications)
 - Click on "New Application"
-- Put "Dev Game Dev Club Club Bot" or whatever you want as the name
+- Name it something like "Dev GDCC Bot"
 - Click on "Create"
 - Open the [.dev.vars](/.dev.vars) file in your local repository
 - Copy "Application ID" into "DISCORD_APPLICATION_ID"
@@ -36,26 +40,23 @@ Create your own Discord bot to test changes on:
 - Copy "Client Secret" into "DISCORD_TOKEN"
 - Copy the Google API token that I gave you at the start into "GCP_SERVICE_ACCOUNT"
 - Copy the Schools List Google Sheet's ID into "GOOGLE_SHEET_ID"
+- Make a copy of [.dev.vars](/.dev.vars) and save it somewhere safe and secure outside your local repository so you never lose it
+
+### STEP 3: Run the bot locally
+
+Authorize Wrangler:
+```shell
+npx wrangler login
+```
+
+Deploy the bot:
+```shell
+npx wrangler deploy --env dev
+```
+
+- Copy the https URL that it gives you
 - Go back to "General Information" in the [Discord Developer Portal](https://discord.com/developers/applications) and scroll down to "Interactions Endpoint URL"
-
-Run the bot in your local repository:
-```shell
-npx wrangler dev --remote
-```
-
-Make sure it says "Ready on http://127.0.0.1:8787" before continuing.
-
-In a second terminal create a tunnel for Interactions Endpoint URL:
-```shell
-cloudflared tunnel --url http://localhost:8787
-```
-
-NOTE: This next step can be pretty finicky.
-If you keep getting `Validation errors: interactions_endpoint_url: The specified interactions endpoint url could not be verified.` then close all of your terminals and start over from "Run the bot in your local repository"
-
-- Copy the URL under "Your quick Tunnel has been created!" into "Interactions Endpoint URL"
-
-- Type "/discord" after the URL
+- Paste in the https URL and type "/discord" after it
 - Click "Save Changes"
 - Go back to "Oath2"
 - Under Scopes checkmark "Bot" and "applications.commands"
@@ -64,16 +65,16 @@ If you keep getting `Validation errors: interactions_endpoint_url: The specified
 - Open it in your web browser
 - Add the Discord bot to your test server
 
-NOTE: you will have to generate a new URL every time you want to test your bot
+### STEP 4: Register the Discord bot's slash commands
 
-Lastly open a third terminal and run the following in your local repository to register the Discord bot's slash commands:
+Lastly, in your local repository run the following
 ```shell
 npm run register
 ```
 
 ## For those new to GitHub
 
-Create your own branch before making any changes:
+Create your own branch before making any changes (name it based on whatever you're going to work on with it):
 ```shell
 git checkout -b your-branch-name
 ```
@@ -82,6 +83,18 @@ Save changes to your personal branch with:
 ```shell
 git add .
 git commit -m "your message"
+git push origin your-branch-name
+```
+
+To update with other people's changes on your branch:
+```shell
+git fetch origin
+git rebase origin/your-branch-name
+```
+
+If you get "error: failed to push some refs" run:
+```shell
+git pull --rebase origin your-branch-name
 git push origin your-branch-name
 ```
 

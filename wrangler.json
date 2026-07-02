@@ -1,6 +1,12 @@
 {
-    "name": "game-dev-club-club-bot",
-    "main": "src/index.ts",
-    "keep_vars": true,
-    "compatibility_date": "2026-06-28"
+  "name": "game-dev-club-club-bot",
+  "main": "src/index.ts",
+  "keep_vars": true,
+  "compatibility_date": "2026-06-28",
+
+  "env": {
+    "dev": {
+      "name": "dev-gdcc-bot"
+    }
+  }
 }
