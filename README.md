@@ -2,6 +2,8 @@
 
 Discord Bot for the Game Dev Club Club (GDCC - A club of game dev clubs).
 
+The Discord Bot runs remotely on a Cloudflare Worker that automatically updates with this GitHub repo SAFELY for FREE with NO ADS!
+
 
 ## Table of Contents
 
@@ -33,12 +35,12 @@ Authorize Wrangler:
 npx wrangler login
 ```
 
-Deploy the bot:
+Deploy Worker:
 ```shell
 npx wrangler deploy --env dev
 ```
 
-### STEP 3: Create Discord bot
+### STEP 3: Create Discord Bot
 
 - Make a test server on [Discord](https://discord.com) to test your bot on
 - Go to [Discord Developer Portal](https://discord.com/developers/applications)
@@ -46,13 +48,13 @@ npx wrangler deploy --env dev
 - Name it something like "Dev GDCC Bot"
 - Click on "Create"
 
-### STEP 4: Set up bot
+### STEP 4: Set up APIs
 
 - In a new tab go to [Cloudflare](https://dash.cloudflare.com)
 - Click on "dev-gdcc-bot" in "Workers and Pages"
 - Click on "Settings"
 - Click on "Add" in Variables and secrets
-- Add the following variables
+- Add the following variables:
 
 ```
 Type    Variable name
@@ -85,9 +87,9 @@ Text    GOOGLE_SHEET_ID
 - Under "Bot Permissions" checkmark "Manage Roles", "Ban Members", and "Send Messages"
 - Copy the "Generated URL" at the bottom
 - Open it in your web browser
-- Add the Discord bot to your test server
+- Add the Discord Bot to your test server
 
-### STEP 5: Register the Discord bot's slash commands
+### STEP 5: Register the Discord Bot's slash commands
 
 Windows:
 ```shell
