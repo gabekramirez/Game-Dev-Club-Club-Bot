@@ -25,6 +25,15 @@ cd Game-Dev-Club-Club-Bot
 npm install
 ```
 
+Create a new file called ".dev.vars" in your local repository and paste the following text into it:
+```
+DISCORD_APPLICATION_ID=
+DISCORD_PUBLIC_KEY=
+DISCORD_TOKEN=
+GCP_SERVICE_ACCOUNT=
+GOOGLE_SHEET_ID=
+```
+
 ### STEP 2: Create your own Discord bot to test changes on
 
 - Make a test server on [Discord](https://discord.com) to test your bot on
@@ -32,7 +41,7 @@ npm install
 - Click on "New Application"
 - Name it something like "Dev GDCC Bot"
 - Click on "Create"
-- Open the [.dev.vars](/.dev.vars) file in your local repository
+- Open the ".dev.vars" file
 - Copy "Application ID" into "DISCORD_APPLICATION_ID"
 - Copy "Public Key" into "DISCORD_PUBLIC_KEY"
 - Go to "OAuth2" and click on "Reset Secret"
