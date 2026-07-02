@@ -81,8 +81,8 @@ Text    GOOGLE_SHEET_ID
 - Paste in the URL that you copied earlier and type "/discord" after it
 - Click "Save Changes"
 - Go back to "Oath2"
-- Under Scopes checkmark "Bot" and "applications.commands"
-- Under Bot Permissions checkmark "Manage Roles", "Ban Members", and "Send Messages"
+- Under "Scopes" checkmark "Bot" and "applications.commands"
+- Under "Bot Permissions" checkmark "Manage Roles", "Ban Members", and "Send Messages"
 - Copy the "Generated URL" at the bottom
 - Open it in your web browser
 - Add the Discord bot to your test server
