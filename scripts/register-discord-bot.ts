@@ -1,5 +1,3 @@
-import { env } from "./env.ts";
-
 /**
  * This file is meant to be run from the command line, and is not used by the
  * application server.  It's allowed to use node.js primitives, and only needs
@@ -21,8 +19,8 @@ const ALL_COMMANDS = [GET_FIRST_CELL_COMMAND];
 
 
 
-const token = env.DISCORD_TOKEN;
-const applicationId = env.DISCORD_APPLICATION_ID;
+const token = process.env.DISCORD_TOKEN;
+const applicationId = process.env.DISCORD_APPLICATION_ID;
 
 if (!token) {
   throw new Error('The DISCORD_TOKEN environment variable is required.');
