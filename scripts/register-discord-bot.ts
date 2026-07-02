@@ -1,9 +1,9 @@
-// SLASH COMMANDS
-const GET_FIRST_CELL_COMMAND = {
-  name: "getfirstcell",
-  description: "Shows the value of Sheet1!A1",
-};
-const ALL_COMMANDS = [GET_FIRST_CELL_COMMAND];
+const SLASH_COMMANDS = [
+  {
+    name: "getfirstcell",
+    description: "Shows the value of Sheet1!A1",
+  }
+];
 
 
 
@@ -24,7 +24,7 @@ async function main() {
       "Content-Type": "application/json",
       Authorization: `Bot ${token}`,
     },
-    body: JSON.stringify(ALL_COMMANDS)
+    body: JSON.stringify(SLASH_COMMANDS)
   });
 
   if (response.ok) {
