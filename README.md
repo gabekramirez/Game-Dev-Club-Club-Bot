@@ -29,7 +29,7 @@ Create your own Discord bot to test changes on:
 - Copy "Client Secret" into "DISCORD_TOKEN"
 - Copy the Google API token that I gave you at the start into "GCP_SERVICE_ACCOUNT"
 - Copy the Schools List Google Sheet's ID into "GOOGLE_SHEET_ID"
-- Go back to "General Information" and scroll down to "Interactions Endpoint URL"
+- Go back to "General Information" in the [Discord Developer Portal](https://discord.com/developers/applications) and scroll down to "Interactions Endpoint URL"
 
 Run the bot in your local repository:
 ```shell
