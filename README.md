@@ -36,12 +36,22 @@ Run the bot in your local repository:
 npx wrangler dev --remote
 ```
 
+Make sure it says "Ready on http://127.0.0.1:8787" before continuing.
+
 In a second terminal create a tunnel for Interactions Endpoint URL:
 ```shell
 cloudflared tunnel --url http://localhost:8787
 ```
 
+NOTE: This next step can be pretty finicky.
+If you keep getting
+
+"Validation errors: interactions_endpoint_url: The specified interactions endpoint url could not be verified."
+
+close all of your terminals and start over from "Run the bot in your local repository"
+
 - Copy the URL under "Your quick Tunnel has been created!" into "Interactions Endpoint URL"
+
 - Type "/discord" after the URL
 - Click "Save Changes"
 - Go back to "Oath2"
