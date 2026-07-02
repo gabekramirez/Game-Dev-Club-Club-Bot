@@ -67,8 +67,7 @@ Text    GOOGLE_SHEET_ID
 - Confirm
 - Copy "Client Secret" into "DISCORD_TOKEN"
 - Copy the Google API token that I gave you at the start into "GCP_SERVICE_ACCOUNT"
-- Copy the Schools List Google Sheet's ID into "GOOGLE_SHEET_ID"
-- Make a copy of .dev.vars and save it somewhere safe and secure outside your local repository so you never lose it
+- Copy the Schools List Google Sheet's ID into "GOOGLE_SHEET_ID" (part of the URL after "spreadsheets/d/" and before the next "/" after that)
 
 - Copy the https URL that it gives you
 - Go back to "General Information" in the [Discord Developer Portal](https://discord.com/developers/applications) and scroll down to "Interactions Endpoint URL"
