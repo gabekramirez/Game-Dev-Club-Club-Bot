@@ -41,7 +41,7 @@ GOOGLE_SHEET_ID=
 - Click on "New Application"
 - Name it something like "Dev GDCC Bot"
 - Click on "Create"
-- Open the .dev.vars file
+- Open the .dev.vars file from before
 - Copy "Application ID" into "DISCORD_APPLICATION_ID"
 - Copy "Public Key" into "DISCORD_PUBLIC_KEY"
 - Go to "OAuth2" and click on "Reset Secret"
