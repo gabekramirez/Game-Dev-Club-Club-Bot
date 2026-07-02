@@ -4,7 +4,10 @@ Discord Bot for the Game Dev Club Club (GDCC - A club of game dev clubs).
 
 ## Development Setup
 
-REQUIREMENTS: git, npm, cloudflared
+INSTALL:
+- [git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
+- [npm](https://docs.npmjs.com/cli/v9/configuring-npm/install)
+- [cloudflared](https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/downloads/)
 
 Clone the GitHub repo:
 ```shell
