@@ -25,7 +25,7 @@ cd Game-Dev-Club-Club-Bot
 npm install
 ```
 
-Create a new file called ".dev.vars" in your local repository and paste the following text into it:
+Create a new file called .dev.vars in your local repository and paste the following text into it:
 ```
 DISCORD_APPLICATION_ID=
 DISCORD_PUBLIC_KEY=
@@ -41,7 +41,7 @@ GOOGLE_SHEET_ID=
 - Click on "New Application"
 - Name it something like "Dev GDCC Bot"
 - Click on "Create"
-- Open the ".dev.vars" file
+- Open the .dev.vars file
 - Copy "Application ID" into "DISCORD_APPLICATION_ID"
 - Copy "Public Key" into "DISCORD_PUBLIC_KEY"
 - Go to "OAuth2" and click on "Reset Secret"
@@ -49,7 +49,7 @@ GOOGLE_SHEET_ID=
 - Copy "Client Secret" into "DISCORD_TOKEN"
 - Copy the Google API token that I gave you at the start into "GCP_SERVICE_ACCOUNT"
 - Copy the Schools List Google Sheet's ID into "GOOGLE_SHEET_ID"
-- Make a copy of [.dev.vars](/.dev.vars) and save it somewhere safe and secure outside your local repository so you never lose it
+- Make a copy of .dev.vars and save it somewhere safe and secure outside your local repository so you never lose it
 
 ### STEP 3: Run the bot locally
 
@@ -94,6 +94,10 @@ git add .
 git commit -m "your message"
 git push origin your-branch-name
 ```
+
+DO NOT PUSH ANY PRIVATE INFORMATION TO YOUR BRANCH FOR ALL TO SEE!!!
+
+NOTE THAT .dev.vars IS NOT INCLUDED WHEN YOU PUSH BECAUSE IT IS LISTED IN [.gitignore](/.gitignore)
 
 To update with other people's changes on your branch:
 ```shell
