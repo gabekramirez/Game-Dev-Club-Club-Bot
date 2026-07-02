@@ -2,6 +2,13 @@
 Discord Bot for the Game Dev Club Club (GDCC - A club of game dev clubs).
 
 
+## Table of Contents
+- [Development Setup](#development-setup)
+- [For those new to GitHub](#for-those-new-to-github)
+- [Must be ran after editing slash commands to reregister them](#must-be-ran-after-editing-slash-commands-to-reregister-them)
+- [USEFUL RESOURCES](useful-resources)
+
+
 ## Development Setup
 
 Before following Development Setup, send me (@ninwu) a DM on Discord about wanting to contribute and I will give you the Google API token.
@@ -66,12 +73,14 @@ Lastly run the following to register the Discord bot's slash commands:
 npm run register
 ```
 
+## For those new to GitHub
+
 Create your own branch before making any changes:
 ```shell
 git checkout -b your-branch-name
 ```
 
-Update your personal branch:
+Save changes to your personal branch with:
 ```shell
 git add .
 git commit -m "your message"
@@ -81,14 +90,14 @@ git push origin your-branch-name
 Open a pull request on [GitHub](https://github.com/gabekramirez/Game-Dev-Club-Club-Bot/compare) to request that I add your changes when you're done.
 
 
-## Must be ran after editing slash commands
+## Must be ran after editing slash commands to reregister them
 
 For development use:
 ```shell
 npm run register
 ```
 
-For production use:
+For production use (likely only going to be used by me):
 ```shell
 node --import tsx scripts/register-discord-bot.ts --prod
 ```
