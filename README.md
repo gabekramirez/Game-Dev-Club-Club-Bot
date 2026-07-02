@@ -1,8 +1,10 @@
 # Game-Dev-Club-Club-Bot
+
 Discord Bot for the Game Dev Club Club (GDCC - A club of game dev clubs).
 
 
 ## Table of Contents
+
 - [Development Setup](#development-setup)
 - [For those new to GitHub](#for-those-new-to-github)
 - [Must be ran after editing slash commands to reregister them](#must-be-ran-after-editing-slash-commands-to-reregister-them)
@@ -37,7 +39,7 @@ Deploy the bot:
 npx wrangler deploy --env dev
 ```
 
-### STEP 2: Create your own Discord bot to test changes on
+### STEP 3: Create your own Discord bot to test changes on
 
 - Make a test server on [Discord](https://discord.com) to test your bot on
 - Go to [Discord Developer Portal](https://discord.com/developers/applications)
@@ -87,6 +89,7 @@ Lastly, in your local repository run the following
 npm run register
 ```
 
+
 ## For those new to GitHub
 
 Create your own branch before making any changes (name it based on whatever you're going to work on with it):
@@ -94,18 +97,14 @@ Create your own branch before making any changes (name it based on whatever you'
 git checkout -b your-branch-name
 ```
 
-Save changes to your personal branch with:
+Publish changes on your personal branch to GitHub with:
 ```shell
 git add .
 git commit -m "your message"
 git push origin your-branch-name
 ```
 
-DO NOT PUSH ANY PRIVATE INFORMATION TO YOUR BRANCH FOR ALL TO SEE!!!
-
-NOTE THAT .dev.vars IS NOT INCLUDED WHEN YOU PUSH BECAUSE IT IS LISTED IN [.gitignore](/.gitignore)
-
-To update with other people's changes on your branch:
+To update your branch with other's changes made to it on GitHub:
 ```shell
 git fetch origin
 git rebase origin/your-branch-name
