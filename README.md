@@ -92,7 +92,7 @@ Text    GOOGLE_SHEET_ID
 ### STEP 5: Register the Discord Bot's slash commands
 
 ```shell
-npx tsx scripts/register-discord-bot.ts YourDiscordBotApplicationIDHere YourDiscordBotTokenHere
+npx tsx scripts/register-discord-bot.ts InsertDiscordBotApplicationIDHere InsertDiscordBotTokenHere
 ```
 
 NOTE: You will have to redo this last step whenever you edit this file to register the slash commands
