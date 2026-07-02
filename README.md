@@ -25,15 +25,6 @@ cd Game-Dev-Club-Club-Bot
 npm install
 ```
 
-Create a new file called .dev.vars in your local repository and paste the following text into it:
-```
-DISCORD_APPLICATION_ID=
-DISCORD_PUBLIC_KEY=
-DISCORD_TOKEN=
-GCP_SERVICE_ACCOUNT=
-GOOGLE_SHEET_ID=
-```
-
 ### STEP 2: Run the bot in development
 
 Authorize Wrangler:
