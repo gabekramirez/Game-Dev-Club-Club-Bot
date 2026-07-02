@@ -21,9 +21,6 @@ if (!result.parsed) {
   throw new Error(`Env file parsed empty: ${envPath}`);
 }
 
-/**
- * 🚨 IMPORTANT: DO NOT use process.env at all
- */
 const envRaw = result.parsed;
 
 export const env = {
@@ -34,7 +31,3 @@ export const env = {
   GUILD_ID: envRaw.GUILD_ID!,
   DISCORD_PUBLIC_KEY: envRaw.DISCORD_PUBLIC_KEY!,
 };
-
-console.log("USING ENV FILE:", envPath);
-console.log("APP ID:", env.DISCORD_APPLICATION_ID);
-console.log("TOKEN START:", env.DISCORD_TOKEN.slice(0, 10));
