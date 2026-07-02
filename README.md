@@ -14,7 +14,7 @@ Discord Bot for the Game Dev Club Club (GDCC - A club of game dev clubs).
 ### STEP 0: Before following Development Setup
 
 - Send me (@ninwu) a DM on Discord about wanting to contribute and I will give you the Google API token.
-- Install the required software: [git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) [npm](https://docs.npmjs.com/cli/v9/configuring-npm/install)
+- Install the required software: [git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) | [npm](https://docs.npmjs.com/cli/v9/configuring-npm/install)
 - Create a [Cloudflare](https://dash.cloudflare.com/login) account and login to it
 
 ### STEP 1: Clone the GitHub repo
