@@ -34,24 +34,7 @@ GCP_SERVICE_ACCOUNT=
 GOOGLE_SHEET_ID=
 ```
 
-### STEP 2: Create your own Discord bot to test changes on
-
-- Make a test server on [Discord](https://discord.com) to test your bot on
-- Go to [Discord Developer Portal](https://discord.com/developers/applications)
-- Click on "New Application"
-- Name it something like "Dev GDCC Bot"
-- Click on "Create"
-- Open the .dev.vars file from before
-- Copy "Application ID" into "DISCORD_APPLICATION_ID"
-- Copy "Public Key" into "DISCORD_PUBLIC_KEY"
-- Go to "OAuth2" and click on "Reset Secret"
-- Confirm
-- Copy "Client Secret" into "DISCORD_TOKEN"
-- Copy the Google API token that I gave you at the start into "GCP_SERVICE_ACCOUNT"
-- Copy the Schools List Google Sheet's ID into "GOOGLE_SHEET_ID"
-- Make a copy of .dev.vars and save it somewhere safe and secure outside your local repository so you never lose it
-
-### STEP 3: Run the bot locally
+### STEP 2: Run the bot in development
 
 Authorize Wrangler:
 ```shell
@@ -62,6 +45,39 @@ Deploy the bot:
 ```shell
 npx wrangler deploy --env dev
 ```
+
+### STEP 2: Create your own Discord bot to test changes on
+
+- Make a test server on [Discord](https://discord.com) to test your bot on
+- Go to [Discord Developer Portal](https://discord.com/developers/applications)
+- Click on "New Application"
+- Name it something like "Dev GDCC Bot"
+- Click on "Create"
+- In a new tab go to [Cloudflare](https://dash.cloudflare.com)
+- Click on "dev-gdcc-bot" in "Workers and Pages"
+- Click on "Settings"
+- Click on "Add" in Variables and secrets
+- Add the following variables
+
+```
+Type    Variable name
+
+Text    DISCORD_APPLICATION_ID
+Text    DISCORD_PUBLIC_KEY
+Secret  DISCORD_TOKEN
+Secret  GCP_SERVICE_ACCOUNT
+Text    GOOGLE_SHEET_ID
+```
+
+- Next copy the following values from the Discord Developer Portal into the variables you just made
+- Copy "Application ID" into "DISCORD_APPLICATION_ID"
+- Copy "Public Key" into "DISCORD_PUBLIC_KEY"
+- Go to "OAuth2" and click on "Reset Secret"
+- Confirm
+- Copy "Client Secret" into "DISCORD_TOKEN"
+- Copy the Google API token that I gave you at the start into "GCP_SERVICE_ACCOUNT"
+- Copy the Schools List Google Sheet's ID into "GOOGLE_SHEET_ID"
+- Make a copy of .dev.vars and save it somewhere safe and secure outside your local repository so you never lose it
 
 - Copy the https URL that it gives you
 - Go back to "General Information" in the [Discord Developer Portal](https://discord.com/developers/applications) and scroll down to "Interactions Endpoint URL"
