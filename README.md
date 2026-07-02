@@ -4,6 +4,8 @@ Discord Bot for the Game Dev Club Club (GDCC - A club of game dev clubs).
 
 ## Development Setup
 
+Before following Development Setup, send me (@ninwu) a DM on Discord about wanting to contribute and I will give you the Google API token.
+
 INSTALL REQUIRED SOFTWARE: [git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) [npm](https://docs.npmjs.com/cli/v9/configuring-npm/install) [cloudflared](https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/downloads/)
 
 Clone the GitHub repo:
@@ -19,15 +21,17 @@ Create your own Discord bot to test changes on:
 - Click on "New Application"
 - Put "Dev Game Dev Club Club Bot" or whatever you want as the name
 - Click on "Create"
-- Open the [.dev.vars](/.dev.vars) file
+- Open the [.dev.vars](/.dev.vars) file in your local repository
 - Copy "Application ID" into "DISCORD_APPLICATION_ID"
 - Copy "Public Key" into "DISCORD_PUBLIC_KEY"
 - Go to "OAuth2" and click on "Reset Secret"
 - Confirm
 - Copy "Client Secret" into "DISCORD_TOKEN"
+- Copy the Google API token that I gave you at the start into "GCP_SERVICE_ACCOUNT"
+- Copy the Schools List Google Sheet's ID into "GOOGLE_SHEET_ID"
 - Go back to "General Information" and scroll down to "Interactions Endpoint URL"
 
-Run the bot:
+Run the bot in your local repository:
 ```shell
 npx wrangler dev --remote
 ```
