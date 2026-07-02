@@ -4,8 +4,7 @@
     "scripts": {
         
         "dev": "wrangler dev",
-        "deploy": "wrangler deploy",
-        "register": "tsx scripts/register-discord-bot.ts"
+        "deploy": "wrangler deploy"
     },
     "devDependencies": {
         "tsx": "^4.22.4",
