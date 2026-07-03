@@ -1,4 +1,4 @@
-import { handleDiscordRequest } from "./discord.ts";
+import { handleDiscordRequest, handleDiscordUpdate } from "./discord.ts";
 
 
 export default {
@@ -6,9 +6,15 @@ export default {
         const url = new URL(request.url);
 
         switch (`${request.method} ${url.pathname}`) {
-            case "GET /health": return new Response("OK");
-            case "POST /discord": return handleDiscordRequest(request, env, ctx);
-            default: {return new Response("NOT FOUND", {status: 404})}
+            case "GET /health":
+                return new Response("OK");
+            case "POST /discord":
+                return handleDiscordRequest(request, env, ctx);
+            default:
+                return new Response("NOT FOUND", {status: 404});
         }
+    },
+    async scheduled(controller: ScheduledController, env: Env, ctx: ExecutionContext) {
+        ctx.waitUntil(handleDiscordUpdate(controller, env, ctx));
     }
 };

@@ -40,6 +40,8 @@ Deploy Worker:
 npx wrangler deploy --env dev
 ```
 
+NOTE: You will have to redo this step to update your worker
+
 ### STEP 3: Create Discord Bot
 
 - Make a test server on [Discord](https://discord.com) to test your bot on
@@ -57,13 +59,14 @@ npx wrangler deploy --env dev
 - Add the following variables:
 
 ```
-Type    Variable name
+Type      Variable name
 
-Text    DISCORD_APPLICATION_ID
-Text    DISCORD_PUBLIC_KEY
-Secret  DISCORD_TOKEN
-Secret  GCP_SERVICE_ACCOUNT
-Text    GOOGLE_SHEET_ID
+Text      DISCORD_APPLICATION_ID
+Text      DISCORD_PUBLIC_KEY
+Secret    DISCORD_TOKEN
+Secret    DISCORD_CLUB_LIST_CHANNEL_ID
+Secret    GCP_SERVICE_ACCOUNT
+Text      GOOGLE_SHEET_ID
 ```
 
 - Next copy the following values from the Discord Developer Portal into the variables you just made
@@ -73,6 +76,7 @@ Text    GOOGLE_SHEET_ID
 - Confirm
 - Copy into "DISCORD_TOKEN"
 - Save this Discord bot token somewhere safe and private where you won't lose it (NOT THE REPO)
+- Type into DISCORD_CLUB_LIST_CHANNEL_ID the channel ID of the club list in your test server (or 0 for no club list)
 - Copy the Google API token that I gave you at the start into "GCP_SERVICE_ACCOUNT"
 - Copy the Schools List Google Sheet's ID into "GOOGLE_SHEET_ID" (part of the URL after "spreadsheets/d/" and before the next "/" after that)
 - Click on "Deploy"
@@ -83,19 +87,21 @@ Text    GOOGLE_SHEET_ID
 - Paste in the URL that you copied earlier and type "/discord" after it
 - Click "Save Changes"
 - Go back to "Oath2"
-- Under "Scopes" checkmark "Bot" and "applications.commands"
-- Under "Bot Permissions" checkmark "Manage Roles", "Ban Members", and "Send Messages"
+- Under "Scopes" checkmark "bot" and "applications.commands"
+- Under "Bot Permissions" checkmark "Manage Roles", "Ban Members", "Manage Webhooks", and "Send Messages"
 - Copy the "Generated URL" at the bottom
 - Open it in your web browser
 - Add the Discord Bot to your test server
 
 ### STEP 5: Register the Discord Bot's slash commands
 
+Run to get webhook link:
 ```shell
-npx tsx scripts/register-discord-bot.ts InsertDiscordBotApplicationIDHere InsertDiscordBotTokenHere
+npx tsx scripts/register-slash-commands.ts InsertDiscordBotTokenHere InsertDiscordBotApplicationIDHere
 ```
+Go to 
 
-NOTE: You will have to redo this last step whenever you edit this file to register the slash commands
+NOTE: You will have to redo this whenever you want to update slash commands
 
 
 ## For those new to GitHub
@@ -129,8 +135,10 @@ Open a pull request on [GitHub](https://github.com/gabekramirez/Game-Dev-Club-Cl
 
 ## USEFUL RESOURCES
 
-- GOOGLE SHEETS API ACCOUNT: https://www.datacamp.com/tutorial/google-sheets-api
-- GOOGLE SHEETS API: https://medium.com/@tamnvhustcc/how-to-authenticate-google-apis-on-cloudflare-workers-in-2025-a-complete-guide-with-custom-jwt-80614398425a
+- GOOGLE SHEETS ACCOUNT: https://www.datacamp.com/tutorial/google-sheets-api
+- GOOGLE SHEETS AUTHENTICATION: https://medium.com/@tamnvhustcc/how-to-authenticate-google-apis-on-cloudflare-workers-in-2025-a-complete-guide-with-custom-jwt-80614398425a
+- GOOGLE SHEETS API: https://developers.google.com/workspace/sheets/api/guides/concepts
 - DISCORD BOT SETUP: https://docs.discord.com/developers/tutorials/hosting-on-cloudflare-workers?EwVcT9cY=9Ur0EzgkC
-- DISCORD BOT RESPONSE: https://docs.discord.com/developers/interactions/receiving-and-responding
-- CRON TRIGGERS: https://reintech.io/blog/setting-up-cloudflare-workers-cron-triggers
+- DISCORD BOT INTERACTIONS: https://docs.discord.com/developers/interactions/receiving-and-responding
+- DISCORD BOT WEBHOOKS: https://pinggy.io/blog/how_to_set_up_and_test_discord_bot_webhook/
+- CRON TRIGGERS: https://developers.cloudflare.com/workers/runtime-apis/handlers/scheduled
