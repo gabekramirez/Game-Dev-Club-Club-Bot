@@ -5,7 +5,7 @@ const SLASH_COMMANDS = [
         options: [
             {
                 name: "club",
-                description: "Club role from #list-of-clubs",
+                description: "Your one club from #list-of-clubs | Choosing one you already have removes it",
                 type: 8,
                 required: true
             }

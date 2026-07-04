@@ -141,6 +141,43 @@ async function getRolePosition(roleID: string, env: Env): Promise<number> {
 }
 
 
+async function getRoles(userID: string, env: Env): Promise<string[]> {
+    if (env.DISCORD_GUILD_ID === "0") return [];
+    const response = await fetch(`https://discord.com/api/v10/guilds/${env.DISCORD_GUILD_ID}/members/${userID}`, {
+        method: "GET",
+        headers: {
+            "Authorization": `Bot ${env.DISCORD_TOKEN}`
+        }
+    });
+    if (!response.ok) {throw new Error(await response.text());}
+    return (await response.json()).roles;
+}
+
+
+async function giveRole(userID: string, roleID: string, env: Env): Promise<any> {
+    if (env.DISCORD_GUILD_ID === "0") {return null;}
+    const response = await fetch(`https://discord.com/api/v10/guilds/${env.DISCORD_GUILD_ID}/members/${userID}/roles/${roleID}`, {
+        method: "PUT",
+        headers: {
+            "Authorization": `Bot ${env.DISCORD_TOKEN}`
+        }
+    });
+    if (!response.ok) {throw new Error(await response.text());}
+}
+
+
+async function removeRole(userID: string, roleID: string, env: Env): Promise<any> {
+    if (env.DISCORD_GUILD_ID === "0") {return null;}
+    const response = await fetch(`https://discord.com/api/v10/guilds/${env.DISCORD_GUILD_ID}/members/${userID}/roles/${roleID}`, {
+        method: "DELETE",
+        headers: {
+            "Authorization": `Bot ${env.DISCORD_TOKEN}`
+        }
+    });
+    if (!response.ok) {throw new Error(await response.text());}
+}
+
+
 export async function handleDiscordRequest(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     try {
         // This is for setting up Interactions Endpoint URL
@@ -162,17 +199,26 @@ export async function handleDiscordRequest(request: Request, env: Env, ctx: Exec
             switch (name) {
 
                 case "club": {
-                    const roleId = interaction.data?.options[0].value;
+                    const roleID = interaction.data?.options[0].value;
                     ctx.waitUntil((async () => {
                         try {
                             const clubRoles = (await sheetsGet("Main!G:G", env)).slice(1).map(row => row[0]);
-                            if (roleId != null && clubRoles.includes(roleId)) {
-                                await slashCommandReply(`Successfully gave role <@&${roleId}>!`, env, interaction, true);
+                            if (roleID != null && clubRoles.includes(roleID)) {
+                                const oldRoles = (await getRoles(interaction.member.user.id, env)).filter(role => clubRoles.includes(role));
+                                for (var role of oldRoles) {
+                                    removeRole(interaction.member.user.id, role, env);
+                                }
+                                if (oldRoles.includes(roleID)) {
+                                    await slashCommandReply(`You lost role <@&${roleID}> ...`, env, interaction, true);
+                                } else {
+                                    await giveRole(interaction.member.user.id, roleID, env);
+                                    await slashCommandReply(`Successfully obtained role <@&${roleID}> !`, env, interaction, true);
+                                }
                             } else {
-                                await slashCommandReply(`Nice try! <@&${roleId}> is not a valid club role.`, env, interaction, true);
+                                await slashCommandReply(`Nice try! <@&${roleID}> is not a valid club role.`, env, interaction, true);
                             }
                         } catch (err) {
-                            await slashCommandReply(`Error giving role <@&${roleId}>. Please report to admin.`, env, interaction, true);
+                            await slashCommandReply(`Error giving role <@&${roleID}>. Please report to admin.`, env, interaction, true);
                         }
                     })());
                     return await defferedReply();
