@@ -1,7 +1,15 @@
 const SLASH_COMMANDS = [
     {
-        name: "getfirstcell",
-        description: "Shows the value of Sheet1!A1"
+        name: "club",
+        description: "Get your club's role!",
+        options: [
+            {
+                name: "club",
+                description: "Club role from #list-of-clubs",
+                type: 8,
+                required: true
+            }
+        ]
     }
 ];
 
@@ -16,20 +24,13 @@ async function main() {
     if (!token) throw new Error("Missing Discord Token");
     if (!applicationId) throw new Error("Missing Discord Application ID");
 
-    const url = `https://discord.com/api/v10/applications/${applicationId}/commands`;
-
-    const response = await fetch(url, {
+    const response = await fetch(`https://discord.com/api/v10/applications/${applicationId}/commands`, {
         method: "PUT",
         headers: {"Content-Type": "application/json", Authorization: `Bot ${token}`},
         body: JSON.stringify(SLASH_COMMANDS)
     });
-
-    if (response.ok) {
-        console.log("Registered all commands");
-    } else {
-        console.error("Error registering commands");
-        console.error(await response.text());
-    }
+    if (!response.ok) {throw new Error(await response.text());}
+    console.log("Registered all commands");
 }
 
 

@@ -65,6 +65,8 @@ Text      DISCORD_APPLICATION_ID
 Text      DISCORD_PUBLIC_KEY
 Secret    DISCORD_TOKEN
 Secret    DISCORD_CLUB_LIST_CHANNEL_ID
+Secret    DISCORD_GUILD_ID
+Secret    DISCORD_NEW_ROLE_POSITION
 Secret    GCP_SERVICE_ACCOUNT
 Text      GOOGLE_SHEET_ID
 ```
@@ -76,7 +78,9 @@ Text      GOOGLE_SHEET_ID
 - Confirm
 - Copy into "DISCORD_TOKEN"
 - Save this Discord bot token somewhere safe and private where you won't lose it (NOT THE REPO)
-- Type into DISCORD_CLUB_LIST_CHANNEL_ID the channel ID of the club list in your test server (or 0 for no club list)
+- Type into DISCORD_CLUB_LIST_CHANNEL_ID the Channel ID of the club list in your test server (or 0 for none)
+- Type into DISCORD_GUILD_ID the Server ID in your test server (or 0 for none)
+- Type into DISCORD_NEW_ROLE_POSITION the Role ID of the role to insert new club roles above in your test server (or 0 for none)
 - Copy the Google API token that I gave you at the start into "GCP_SERVICE_ACCOUNT"
 - Copy the Schools List Google Sheet's ID into "GOOGLE_SHEET_ID" (part of the URL after "spreadsheets/d/" and before the next "/" after that)
 - Click on "Deploy"
@@ -95,13 +99,20 @@ Text      GOOGLE_SHEET_ID
 
 ### STEP 5: Register the Discord Bot's slash commands
 
-Run to get webhook link:
+Run to get slash commands:
 ```shell
 npx tsx scripts/register-slash-commands.ts InsertDiscordBotTokenHere InsertDiscordBotApplicationIDHere
 ```
 Go to 
 
 NOTE: You will have to redo this whenever you want to update slash commands
+
+### DEBUGGING
+
+Run this to see console logs
+```shell
+npx wrangler tail --env dev
+```
 
 
 ## For those new to GitHub
@@ -139,6 +150,7 @@ Open a pull request on [GitHub](https://github.com/gabekramirez/Game-Dev-Club-Cl
 - GOOGLE SHEETS AUTHENTICATION: https://medium.com/@tamnvhustcc/how-to-authenticate-google-apis-on-cloudflare-workers-in-2025-a-complete-guide-with-custom-jwt-80614398425a
 - GOOGLE SHEETS API: https://developers.google.com/workspace/sheets/api/guides/concepts
 - DISCORD BOT SETUP: https://docs.discord.com/developers/tutorials/hosting-on-cloudflare-workers?EwVcT9cY=9Ur0EzgkC
-- DISCORD BOT INTERACTIONS: https://docs.discord.com/developers/interactions/receiving-and-responding
-- DISCORD BOT WEBHOOKS: https://pinggy.io/blog/how_to_set_up_and_test_discord_bot_webhook/
+- DISCORD BOT INTERACTING: https://docs.discord.com/developers/interactions/receiving-and-responding
+- DISCORD BOT MESSAGING: https://docs.discord.com/developers/resources/channel
+- DISCORD BOT WEBHOOKS: https://pinggy.io/blog/how_to_set_up_and_test_discord_bot_webhook
 - CRON TRIGGERS: https://developers.cloudflare.com/workers/runtime-apis/handlers/scheduled
