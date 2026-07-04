@@ -64,11 +64,11 @@ Type      Variable name
 Text      DISCORD_APPLICATION_ID
 Text      DISCORD_PUBLIC_KEY
 Secret    DISCORD_TOKEN
-Secret    DISCORD_CLUB_LIST_CHANNEL_ID
-Secret    DISCORD_GUILD_ID
+Text      DISCORD_CLUB_LIST_CHANNEL_ID
+Text      DISCORD_GUILD_ID
 Secret    DISCORD_NEW_ROLE_POSITION
 Secret    GCP_SERVICE_ACCOUNT
-Text      GOOGLE_SHEET_ID
+Secret    GOOGLE_SHEET_ID
 ```
 
 - Next copy the following values from the Discord Developer Portal into the variables you just made
