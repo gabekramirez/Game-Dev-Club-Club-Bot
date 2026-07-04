@@ -2,7 +2,7 @@
 
 Discord Bot for the Game Dev Club Club (GDCC - A club of game dev clubs).
 
-The Discord Bot runs remotely on a Cloudflare Worker that automatically updates with this GitHub repo SAFELY for FREE with NO ADS!
+This Discord Bot runs remotely on a Cloudflare Worker that automatically updates with this GitHub repo SAFELY for FREE with NO ADS!
 
 
 ## Table of Contents
