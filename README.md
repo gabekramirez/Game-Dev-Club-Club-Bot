@@ -16,7 +16,7 @@ This Discord Bot runs remotely on a Cloudflare Worker that automatically updates
 
 ### STEP 0: Before following Development Setup
 
-- Send me (@ninwu) a DM on Discord about wanting to contribute and I will give you the Google API token.
+- Send me (@ninwu) a DM on Discord about wanting to contribute and I will invite you to be a collaborator on this repo and give you the Google API token.
 - Install the required software: [git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) | [npm](https://docs.npmjs.com/cli/v9/configuring-npm/install)
 - Make a copy of the Schools List Google sheet for testing and share it with editor access to `game-dev-club-club-bot@game-dev-club-club-bot.iam.gserviceaccount.com`
 - Create a [Cloudflare](https://dash.cloudflare.com/login) account and login to it.
