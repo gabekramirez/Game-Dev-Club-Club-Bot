@@ -127,6 +127,8 @@ npx wrangler tail --env dev
 
 Create your own branch before making any changes (name it based on whatever you're going to work on with it):
 ```shell
+git checkout main
+git pull origin main
 git checkout -b your-branch-name
 git push origin your-branch-name
 ```
