@@ -18,6 +18,7 @@ This Discord Bot runs remotely on a Cloudflare Worker that automatically updates
 
 - Send me (@ninwu) a DM on Discord about wanting to contribute and I will give you the Google API token.
 - Install the required software: [git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) | [npm](https://docs.npmjs.com/cli/v9/configuring-npm/install)
+- Make a copy of the Schools List Google sheet for testing and share it with editor access to `game-dev-club-club-bot@game-dev-club-club-bot.iam.gserviceaccount.com`
 - Create a [Cloudflare](https://dash.cloudflare.com/login) account and login to it.
 
 ### STEP 1: Clone the GitHub repo
@@ -64,25 +65,32 @@ Type      Variable name
 Text      DISCORD_APPLICATION_ID
 Text      DISCORD_PUBLIC_KEY
 Secret    DISCORD_TOKEN
-Text      DISCORD_CLUB_LIST_CHANNEL_ID
 Text      DISCORD_GUILD_ID
-Secret    DISCORD_NEW_ROLE_POSITION
+Text      DISCORD_CLUB_LIST_CHANNEL_ID
+Text      DISCORD_ROLE_POSITION_START
+Text      DISCORD_ROLE_POSITION_END
+Text      DISCORD_ROLE_AUTO_BAN
 Secret    GCP_SERVICE_ACCOUNT
 Secret    GOOGLE_SHEET_ID
 ```
 
-- Next copy the following values from the Discord Developer Portal into the variables you just made
+- Next we'll fill out the variables you just made
+- Go to the Discord Development Portal
 - Copy "Application ID" into "DISCORD_APPLICATION_ID"
 - Copy "Public Key" into "DISCORD_PUBLIC_KEY"
 - Go to "Bot" and click on "Reset Token"
 - Confirm
-- Copy into "DISCORD_TOKEN"
-- Save this Discord bot token somewhere safe and private where you won't lose it (NOT THE REPO)
-- Type into DISCORD_CLUB_LIST_CHANNEL_ID the Channel ID of the club list in your test server (or 0 for none)
+- Copy the token that it gives you into "DISCORD_TOKEN"
+- Save the Discord bot token somewhere safe and private where you won't lose it
+- Scroll down and checkmark "Server Members Intent"
+- Go to your Discord test server
 - Type into DISCORD_GUILD_ID the Server ID in your test server (or 0 for none)
-- Type into DISCORD_NEW_ROLE_POSITION the Role ID of the role to insert new club roles above in your test server (or 0 for none)
+- Type into DISCORD_CLUB_LIST_CHANNEL_ID the Channel ID of the club list in your test server (or 0 for none)
+- Type into DISCORD_ROLE_POSITION_START the Role ID of the role to insert new club roles above in your test server (or 0 for none)
+- Type into DISCORD_ROLE_POSITION_END the Role ID of the role above all of the club roles in your test server (or 0 for none)
+- Type into DISCORD_ROLE_AUTO_BAN the Role ID of the "Auto Ban" role in your test server (or 0 for none)
 - Copy the Google API token that I gave you at the start into "GCP_SERVICE_ACCOUNT"
-- Copy the Schools List Google Sheet's ID into "GOOGLE_SHEET_ID" (part of the URL after "spreadsheets/d/" and before the next "/" after that)
+- Copy your test Google Sheet's ID (NOT THE SCHOOL LIST GOOGLE SHEET) into "GOOGLE_SHEET_ID" (part of the URL after "spreadsheets/d/" and before the next "/" after that)
 - Click on "Deploy"
 - Click on "Visit"
 - Copy the URL at the top
@@ -120,6 +128,7 @@ npx wrangler tail --env dev
 Create your own branch before making any changes (name it based on whatever you're going to work on with it):
 ```shell
 git checkout -b your-branch-name
+git push origin your-branch-name
 ```
 
 Publish changes on your personal branch to GitHub with:

@@ -102,6 +102,18 @@ async function deleteMessage(messageID: string, channelID: string, env: Env) {
 }
 
 
+async function banUser(userID: string, env: Env): Promise<any> {
+    const response = await fetch(`https://discord.com/api/v10/guilds/${env.DISCORD_GUILD_ID}/bans/${userID}`, {
+        method: "PUT",
+        headers: {
+            "Authorization": `Bot ${env.DISCORD_TOKEN}`
+        }
+    });
+    if (!response.ok) {throw new Error(await response.text());}
+    return response.json();
+}
+
+
 async function createRole(name: string, position: number, env: Env): Promise<any> {
     if (env.DISCORD_GUILD_ID === "0") {return null;}
     const response = await fetch(`https://discord.com/api/v10/guilds/${env.DISCORD_GUILD_ID}/roles`, {
@@ -138,6 +150,27 @@ async function getRolePosition(roleID: string, env: Env): Promise<number> {
     const role = roles.find(r => r.id === roleID);
     if (!role) throw new Error("Role not found");
     return role.position;
+}
+
+
+async function getUsersWithRole(roleID: string, env: Env): Promise<any[]> {
+    let members = [];
+    let after = "0";
+
+    while (true) {
+        const response = await fetch(`https://discord.com/api/v10/guilds/${env.DISCORD_GUILD_ID}/members?limit=1000&after=${after}`, {
+            headers: {
+                Authorization: `Bot ${env.DISCORD_TOKEN}`,
+            }
+        });
+        if (!response.ok) {throw new Error(await response.text());}
+
+        const pageMembers = await response.json();
+        if (!pageMembers.length) break;
+        members.push(...pageMembers);
+        after = pageMembers[pageMembers.length - 1].user.id;
+    }
+    return members.filter(member => member.roles.includes(roleID));
 }
 
 
@@ -202,14 +235,17 @@ export async function handleDiscordRequest(request: Request, env: Env, ctx: Exec
                     const roleID = interaction.data?.options[0].value;
                     ctx.waitUntil((async () => {
                         try {
+                            if (env.DISCORD_ROLE_POSITION_START === "0") {throw new Error("Missing DISCORD_ROLE_POSITION_START");}
+                            if (env.DISCORD_ROLE_POSITION_END === "0") {throw new Error("Missing DISCORD_ROLE_POSITION_END");}
                             const clubRoles = (await sheetsGet("Main!G:G", env)).slice(1).map(row => row[0]);
-                            if (roleID != null && clubRoles.includes(roleID)) {
+                            if (roleID != null && clubRoles.includes(roleID) &&
+                            (await getRolePosition(roleID, env)) < (await getRolePosition(env.DISCORD_ROLE_POSITION_END, env))) {
                                 const oldRoles = (await getRoles(interaction.member.user.id, env)).filter(role => clubRoles.includes(role));
                                 for (var role of oldRoles) {
                                     removeRole(interaction.member.user.id, role, env);
                                 }
                                 if (oldRoles.includes(roleID)) {
-                                    await slashCommandReply(`You lost role <@&${roleID}> ...`, env, interaction, true);
+                                    await slashCommandReply(`You lost role <@&${roleID}> x_x`, env, interaction, true);
                                 } else {
                                     await giveRole(interaction.member.user.id, roleID, env);
                                     await slashCommandReply(`Successfully obtained role <@&${roleID}> !`, env, interaction, true);
@@ -218,7 +254,7 @@ export async function handleDiscordRequest(request: Request, env: Env, ctx: Exec
                                 await slashCommandReply(`Nice try! <@&${roleID}> is not a valid club role.`, env, interaction, true);
                             }
                         } catch (err) {
-                            await slashCommandReply(`Error giving role <@&${roleID}>. Please report to admin.`, env, interaction, true);
+                            await slashCommandReply(`Error giving role <@&${roleID}>. Please report to admin. O_O`, env, interaction, true);
                         }
                     })());
                     return await defferedReply();
@@ -241,15 +277,24 @@ export async function handleDiscordRequest(request: Request, env: Env, ctx: Exec
 
 
 export async function handleDiscordUpdate(controller: ScheduledController, env: Env, ctx: ExecutionContext) {
+    if (env.DISCORD_ROLE_AUTO_BAN !== "0") {
+        // ban all users with the "Auto Ban" role
+        for (const user of await getUsersWithRole(env.DISCORD_ROLE_AUTO_BAN, env))
+        {
+            console.log(user);
+            await banUser(user.user.id, env);
+        }
+    }
+
     if (env.DISCORD_CLUB_LIST_CHANNEL_ID !== "0") {
         ctx.waitUntil((async () => {
             try {
+                // query Google Sheets
                 const queryResult = (await sheetsGet("Main!A:G", env)).slice(1);
 
+                // create club list channel text from query result and record club roles
                 var clubs = [];
                 var roles = [];
-
-                // create text from query result
                 var text: string = "";
                 var i = 1;
                 for (const row of queryResult) {
@@ -269,10 +314,10 @@ export async function handleDiscordUpdate(controller: ScheduledController, env: 
                 }
                 text += `**GAME DEV CLUB CLUB CLUB LIST - ${i - 1} clubs and counting B)**`;
 
-                // update roles list
+                // add new Discord roles from Google Sheets
                 var limit = 5
-                if (env.DISCORD_GUILD_ID !== "0" && env.DISCORD_NEW_ROLE_POSITION !== "0") {
-                    const position = (await getRolePosition(env.DISCORD_NEW_ROLE_POSITION, env)) + 1;
+                if (env.DISCORD_GUILD_ID !== "0" && env.DISCORD_ROLE_POSITION_START !== "0" && env.DISCORD_ROLE_POSITION_END !== "0") {
+                    const position = (await getRolePosition(env.DISCORD_ROLE_POSITION_START, env)) + 1;
                     for (var i = 0; i < clubs.length; i++) {
                         if (clubs[i] !== undefined && roles[i] === undefined) {
                             const roleID = (await createRole(clubs[i], position, env));
@@ -295,7 +340,7 @@ export async function handleDiscordUpdate(controller: ScheduledController, env: 
                     start = i + 1;
                 }
 
-                // send/edit/delete messages update list channel
+                // send/edit/delete messages to club list channel
                 var botID = await getBotID(env);
                 var botMessages = [];
                 const oldMessages = (await readMessages(messages.length * 2, env.DISCORD_CLUB_LIST_CHANNEL_ID, env)).reverse();
