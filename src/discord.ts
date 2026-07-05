@@ -237,7 +237,8 @@ export async function handleDiscordRequest(request: Request, env: Env, ctx: Exec
                         try {
                             if (env.DISCORD_ROLE_POSITION_START === "0") {throw new Error("Missing DISCORD_ROLE_POSITION_START");}
                             if (env.DISCORD_ROLE_POSITION_END === "0") {throw new Error("Missing DISCORD_ROLE_POSITION_END");}
-                            const clubRoles = (await sheetsGet("Main!G:G", env)).slice(1).map(row => row[0]);
+                            const roleSheet = env.GOOGLE_SHEET_ROLES != null ? env.GOOGLE_SHEET_ROLES : env.GOOGLE_SHEET_ID; // in production, a second google sheet is used to store role ids instead so that the School List sheet can be read only
+                            const clubRoles = (await sheetsGet("Main!G:G", roleSheet, env)).slice(1).map(row => row[0]);
                             if (roleID != null && clubRoles.includes(roleID) &&
                             (await getRolePosition(roleID, env)) < (await getRolePosition(env.DISCORD_ROLE_POSITION_END, env))) {
                                 const oldRoles = (await getRoles(interaction.member.user.id, env)).filter(role => clubRoles.includes(role));
@@ -289,24 +290,30 @@ export async function handleDiscordUpdate(controller: ScheduledController, env: 
     if (env.DISCORD_CLUB_LIST_CHANNEL_ID !== "0") {
         ctx.waitUntil((async () => {
             try {
-                // query Google Sheets
-                const queryResult = (await sheetsGet("Main!A:G", env)).slice(1);
-
-                // create club list channel text from query result and record club roles
                 var clubs = [];
                 var roles = [];
+
+                // query Google Sheets
+                const queryResult = (await sheetsGet("Main!A:G", env.GOOGLE_SHEET_ID, env)).slice(1);
+                if (env.GOOGLE_SHEET_ROLES != null) {  // in production, a second google sheet is used to store role ids instead so that the School List sheet can be read only
+                    roles = (await sheetsGet("Main!G:G", env.GOOGLE_SHEET_ROLES, env)).slice(1).map(row => row[0]);
+                }
+
+                // create club list channel text from query result and record club roles
                 var text: string = "";
                 var i = 1;
+                var j = -1;
                 for (const row of queryResult) {
+                    j++;
                     if (!row?.[1] || row[5] != "In The Discord") {
-                        clubs.push(undefined);
-                        roles.push(undefined);
+                        clubs.push(null);
+                        if (env.GOOGLE_SHEET_ROLES == null) {roles.push(null);}
                         continue;
                     };
                     clubs.push(row[1]);
-                    roles.push(row[6]);
+                    if (env.GOOGLE_SHEET_ROLES == null) {roles.push(row[6]);}
                     text += `${i}.`;
-                    if (row[6]) text += ` <@&${row[6]}>`;
+                    if (roles[j]) text += ` <@&${roles[j]}>`;
                     text += ` ${row[1]}`;
                     if (row[2]) {text += ` - ${row[2]}`;}
                     text += "\n";
@@ -316,12 +323,15 @@ export async function handleDiscordUpdate(controller: ScheduledController, env: 
 
                 // add new Discord roles from Google Sheets
                 var limit = 5
+                const roleSheet = env.GOOGLE_SHEET_ROLES != null ? env.GOOGLE_SHEET_ROLES : env.GOOGLE_SHEET_ID;
                 if (env.DISCORD_GUILD_ID !== "0" && env.DISCORD_ROLE_POSITION_START !== "0" && env.DISCORD_ROLE_POSITION_END !== "0") {
                     const position = (await getRolePosition(env.DISCORD_ROLE_POSITION_START, env)) + 1;
                     for (var i = 0; i < clubs.length; i++) {
-                        if (clubs[i] !== undefined && roles[i] === undefined) {
+                        if (clubs[i] != null && roles[i] == null) {
+                            console.log(clubs[i]);
+                            console.log(roles[i]);
                             const roleID = (await createRole(clubs[i], position, env));
-                            await sheetsSet(`G${i + 2}`, [[roleID.id]], env);
+                            await sheetsSet(`Main!G${i + 2}:G${i + 2}`, roleSheet, [[roleID.id]], env);
                             limit--;
                         }
                         if (limit === 0) {break;}

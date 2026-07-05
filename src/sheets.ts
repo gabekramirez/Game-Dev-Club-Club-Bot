@@ -1,12 +1,12 @@
 import GoogleAuth, { GoogleKey } from './google-auth.ts';
 
 
-export async function sheetsGet(range: string, env: Env): Promise<any[][]> {
+export async function sheetsGet(range: string, spreadsheet: string, env: Env): Promise<any[][]> {
     const googleAuth: GoogleKey = JSON.parse(env.GCP_SERVICE_ACCOUNT);
     const oauth = new GoogleAuth(googleAuth, ['https://www.googleapis.com/auth/spreadsheets']);
     const accessToken = await oauth.getGoogleAuthToken();
 
-    const response = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${env.GOOGLE_SHEET_ID}/values/${range}`, {
+    const response = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheet}/values/${range}`, {
         method: "GET",
         headers: {Authorization: `Bearer ${accessToken}`}
     });
@@ -16,12 +16,12 @@ export async function sheetsGet(range: string, env: Env): Promise<any[][]> {
 }
 
 
-export async function sheetsSet(range: string, values: any[][], env: Env): Promise<Response> {
+export async function sheetsSet(range: string, spreadsheet: string, values: any[][], env: Env): Promise<Response> {
     const googleAuth: GoogleKey = JSON.parse(env.GCP_SERVICE_ACCOUNT);
     const oauth = new GoogleAuth(googleAuth, ['https://www.googleapis.com/auth/spreadsheets']);
     const accessToken = await oauth.getGoogleAuthToken();
 
-    const response = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${env.GOOGLE_SHEET_ID}/values/${range}?valueInputOption=USER_ENTERED`, {
+    const response = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheet}/values/${range}?valueInputOption=USER_ENTERED`, {
         method: "PUT",
         headers: {Authorization: `Bearer ${accessToken}`, "Content-Type": "application/json"},
         body: JSON.stringify({values})
