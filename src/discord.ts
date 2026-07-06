@@ -377,7 +377,7 @@ export async function handleDiscordUpdate(env: Env, ctx: ExecutionContext) {
                             }
                         }
 
-                        if (passed.includes(role)) {
+                        if (role != null && passed.includes(role)) {
                             numReusedRoles += 1;
                         }
                         passed.push(role);
@@ -391,8 +391,9 @@ export async function handleDiscordUpdate(env: Env, ctx: ExecutionContext) {
                     const discordClubRoles = discordRoles.filter(role => position_start <= role.position && role.position <= position_end)
                     for (var i = 0; i < clubs.length; i++) {
                         if (clubs[i] != null && roles[i] == null) {
-                            if ((discordRoles.length > roles.length - numReusedRoles + 50) ||  // Error when attempting to create a role if there are more than 50 roles that aren't club roles (likely that club roles are being mistaken as not club roles)
-                                (roles.length - numReusedRoles >= discordClubRoles.length)) {  // Error when attempting to create a role if it would make there be more club roles than clubs in the Schools List Google sheet marked as In The Discord (likely there is a duplicate role)
+                            const numClubs = clubs.filter(club => club != null).length;
+                            if ((discordRoles.length > numClubs - numReusedRoles + 50) ||  // Error when attempting to create a role if there are more than 50 roles that aren't club roles (likely that club roles are being mistaken as not club roles)
+                                (discordClubRoles.length >= numClubs - numReusedRoles)) {  // Error when attempting to create a role if it would make there be more club roles than clubs in the Schools List Google sheet marked as In The Discord (likely there is a duplicate role)
                                 text += `\n*Unable to create role for ${clubs[i]} ;-;*`;
                                 break;
                             }
