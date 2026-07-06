@@ -261,6 +261,24 @@ export async function handleDiscordRequest(request: Request, env: Env, ctx: Exec
                     return await defferedReply();
                 }
 
+                case "staff": {
+                    const userID = interaction.data?.options[0].value;
+                    try {
+                        const runnerRoles = await getRoles(interaction.member.user.id, env);
+                        const roles = await getRoles(userID, env);
+                        if (!runnerRoles.includes(env.DISCORD_ROLE_STAFF)) {
+                            return await slashCommandReply(`You don't even have the <@&${env.DISCORD_ROLE_STAFF}> role yourself >:P`, env, interaction);
+                        } else if (roles.includes(env.DISCORD_ROLE_STAFF)) {
+                            return await slashCommandReply(`<@${userID}> already has the <@&${env.DISCORD_ROLE_STAFF}> role :P`, env, interaction);
+                        } else {
+                            await giveRole(userID, env.DISCORD_ROLE_STAFF, env);
+                            return await slashCommandReply(`Successfully gave <@${userID}> the <@&${env.DISCORD_ROLE_STAFF}> role!`, env, interaction);
+                        }
+                    } catch (err) {
+                        return await slashCommandReply(`Error giving <@${userID}> the <@&${env.DISCORD_ROLE_STAFF}> role.`, env, interaction);
+                    }
+                }
+
                 default: {
                     return await slashCommandReply(`Unknown command: /${name}`, env, interaction);
                 }
@@ -282,7 +300,6 @@ export async function handleDiscordUpdate(controller: ScheduledController, env: 
         // ban all users with the "Auto Ban" role
         for (const user of await getUsersWithRole(env.DISCORD_ROLE_AUTO_BAN, env))
         {
-            console.log(user);
             await banUser(user.user.id, env);
         }
     }
@@ -328,8 +345,6 @@ export async function handleDiscordUpdate(controller: ScheduledController, env: 
                     const position = (await getRolePosition(env.DISCORD_ROLE_POSITION_START, env)) + 1;
                     for (var i = 0; i < clubs.length; i++) {
                         if (clubs[i] != null && roles[i] == null) {
-                            console.log(clubs[i]);
-                            console.log(roles[i]);
                             const roleID = (await createRole(clubs[i], position, env));
                             await sheetsSet(`Main!G${i + 2}:G${i + 2}`, roleSheet, [[roleID.id]], env);
                             limit--;
