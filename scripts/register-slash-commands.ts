@@ -4,12 +4,30 @@ const SLASH_COMMANDS = [
         description: "Get your club's role!",
         options: [
             {
-                name: "club",
+                name: "role",
                 description: "Your one club from #list-of-clubs | Choosing one you already have removes it",
                 type: 8,
                 required: true
             }
         ]
+    },
+    {
+        name: "staff",
+        description: "Give others the Staff Staff role",
+        default_member_permissions: "268435456",  // they need Manage Roles permission to see the command
+        options: [
+            {
+                name: "user",
+                description: "User to give the Staff Staff role",
+                type: 6,
+                required: true
+            }
+        ]
+    },
+    {
+        name: "update",
+        description: "Force a server update to run",
+        default_member_permissions: "268435456"  // they need Manage Roles permission to see the command
     }
 ];
 

@@ -15,6 +15,6 @@ export default {
         }
     },
     async scheduled(controller: ScheduledController, env: Env, ctx: ExecutionContext) {
-        ctx.waitUntil(handleDiscordUpdate(controller, env, ctx));
+        ctx.waitUntil(handleDiscordUpdate(env, ctx));
     }
 };
