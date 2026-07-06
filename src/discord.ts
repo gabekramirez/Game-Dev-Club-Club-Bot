@@ -317,7 +317,7 @@ export async function handleDiscordUpdate(env: Env, ctx: ExecutionContext) {
     if (env.DISCORD_CLUB_LIST_CHANNEL_ID !== "0") {
         ctx.waitUntil((async () => {
             try {
-                var otherClubs = [];  // on prod: GOOGLE_SHEET_ID club names
+                var otherClubs = [];  // on prod: GOOGLE_SHEET_ROLES club names
                 var clubs = [];
                 var roles = [];
 
@@ -358,21 +358,29 @@ export async function handleDiscordUpdate(env: Env, ctx: ExecutionContext) {
                     for (const role of roles) {
                         if (env.GOOGLE_SHEET_ROLES != null) {
                             // this keeps the Role IDs in sync with the correct row numbers when clubs are moved or renamed
-                            const otherClub = otherClubs[passed.length];
-                            const newClub = clubs[passed.length];
-                            if (otherClub != newClub) {
+                            var otherClub = otherClubs[passed.length];
+                            var newClub = clubs[passed.length];
+                            if (otherClub != newClub && role != null) {
                                 if (clubs.includes(otherClubs[passed.length])) {
                                     // swap rows
                                     const swapIndex = clubs.indexOf(otherClub);
-                                    const otherRole = roles[passed.length];
-                                    const newRole = roles[swapIndex];
-                                    await sheetsSet(`Main!A${swapIndex + 2}:A${swapIndex + 2}`, env.GOOGLE_SHEET_ROLES, [[otherClub]], env);
+                                    var otherRole = roles[passed.length];
+                                    var newRole = roles[swapIndex];
+                                    otherClubs[swapIndex] = otherClub;
+                                    roles[swapIndex] = otherRole;
+                                    otherClubs[passed.length] = newClub;
+                                    roles[passed.length] = newRole;
+                                    if (otherClub == null) {otherClub = "";}
+                                    if (otherRole == null) {otherRole = "";}
+                                    if (newClub == null) {newClub = "";}
+                                    if (newRole == null) {newRole = "";}
+                                    await sheetsSet(`Main!B${swapIndex + 2}:B${swapIndex + 2}`, env.GOOGLE_SHEET_ROLES, [[otherClub]], env);
                                     await sheetsSet(`Main!G${swapIndex + 2}:G${swapIndex + 2}`, env.GOOGLE_SHEET_ROLES, [[otherRole]], env);
-                                    await sheetsSet(`Main!A${passed.length + 2}:A${passed.length + 2}`, env.GOOGLE_SHEET_ROLES, [[newClub]], env);
+                                    await sheetsSet(`Main!B${passed.length + 2}:B${passed.length + 2}`, env.GOOGLE_SHEET_ROLES, [[newClub]], env);
                                     await sheetsSet(`Main!G${passed.length + 2}:G${passed.length + 2}`, env.GOOGLE_SHEET_ROLES, [[newRole]], env);
                                 } else {
                                     // rename row
-                                    await sheetsSet(`Main!A${passed.length + 2}:A${passed.length + 2}`, env.GOOGLE_SHEET_ROLES, [[newClub]], env);
+                                    await sheetsSet(`Main!B${passed.length + 2}:B${passed.length + 2}`, env.GOOGLE_SHEET_ROLES, [[newClub]], env);
                                 }
                             }
                         }
