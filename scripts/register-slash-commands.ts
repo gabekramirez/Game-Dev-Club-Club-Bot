@@ -23,6 +23,11 @@ const SLASH_COMMANDS = [
                 required: true
             }
         ]
+    },
+    {
+        name: "update",
+        description: "Force a server update to run",
+        default_member_permissions: "268435456"  // they need Manage Roles permission to see the command
     }
 ];
 
