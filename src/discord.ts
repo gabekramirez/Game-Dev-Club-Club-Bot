@@ -349,7 +349,7 @@ export async function handleDiscordUpdate(env: Env, ctx: ExecutionContext) {
                     text += "\n";
                     i++;
                 }
-                text += `**GAME DEV CLUB CLUB CLUB LIST - ${i - 1} clubs and counting B)**`;
+                text += `\n**GAME DEV CLUB CLUB CLUB LIST - ${i - 1} clubs and counting B)**\n\n**Use /club to get your club's role!**`;
 
                 // add new Discord roles from Google Sheets
                 if (env.DISCORD_GUILD_ID !== "0" && env.DISCORD_ROLE_POSITION_START !== "0" && env.DISCORD_ROLE_POSITION_END !== "0") {
