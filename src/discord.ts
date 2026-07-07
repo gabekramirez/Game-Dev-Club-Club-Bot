@@ -343,7 +343,7 @@ export async function handleDiscordUpdate(env: Env, ctx: ExecutionContext) {
                     clubs.push(row[1]);
                     if (env.GOOGLE_SHEET_ROLES == null) {roles.push(row[6]);}
                     text += `${i}.`;
-                    //if (roles[j]) text += ` <@&${roles[j]}>`;
+                    if (roles[j]) text += ` <@&${roles[j]}>`;
                     text += ` ${row[1]}`;
                     if (row[2]) {text += ` - ${row[2]}`;}
                     text += "\n";
