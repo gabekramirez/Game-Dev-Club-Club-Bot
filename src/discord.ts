@@ -286,7 +286,7 @@ export async function handleDiscordRequest(request: Request, env: Env, ctx: Exec
 
                 case "update": {
                     await handleDiscordUpdate(env, ctx);
-                    return await slashCommandReply("Ran update :)", env, interaction);
+                    return await slashCommandReply("Ran update. To make new club roles make sure they are marked as \"In The Discord\" in the Schools List Google sheet.", env, interaction);
                 }
 
                 default: {
