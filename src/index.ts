@@ -1,4 +1,4 @@
-import { handleDiscordRequest, handleDiscordUpdate } from "./discord.ts";
+import { handleDiscordRequest, handleDiscordUpdate } from "./discord-bot.ts";
 
 
 export default {
