@@ -1,11 +1,10 @@
-import { InteractionResponseFlags, verifyKey } from "discord-interactions";
-import { sheetsGet, sheetsSet } from "./sheets.ts";
+import { verifyKey } from "discord-interactions";
 
 
-const MAX_MESSAGE_LENGTH = 2000;
+export const MAX_MESSAGE_LENGTH = 2000;
 
 
-async function verify(request: Request, env: Env): Promise<boolean> {
+export async function verify(request: Request, env: Env): Promise<boolean> {
     const signature = request.headers.get("X-Signature-Ed25519");
     const timestamp = request.headers.get("X-Signature-Timestamp");
     if (!signature || !timestamp) return false;
@@ -14,7 +13,7 @@ async function verify(request: Request, env: Env): Promise<boolean> {
 }
 
 
-async function slashCommandReply(message: string, env: Env, interaction: any, deferred: boolean = false): Promise<Response> {
+export async function slashCommandReply(message: string, env: Env, interaction: any, deferred: boolean = false): Promise<Response> {
     if (deferred)
     {
         // if deferred, make sure it's wrapped in a ctx.waitUntil((async () => {   })());
@@ -31,13 +30,13 @@ async function slashCommandReply(message: string, env: Env, interaction: any, de
 }
 
 
-async function defferedReply(): Promise<Response>
+export async function defferedReply(): Promise<Response>
 {
     return Response.json({type: 5, data: {flags: 64}});
 }
 
 
-async function getBotID(env: Env): Promise<string> {
+export async function getBotID(env: Env): Promise<string> {
     const response = await fetch("https://discord.com/api/v10/users/@me", {
         headers: {
             Authorization: `Bot ${env.DISCORD_TOKEN}`,
@@ -49,7 +48,7 @@ async function getBotID(env: Env): Promise<string> {
 }
 
 
-async function readMessages(count: number, channelID: string, env: Env): Promise<any[]> {
+export async function readMessages(count: number, channelID: string, env: Env): Promise<any[]> {
     if (!Number.isInteger(count)) {throw new Error("count must be an integer");}
     const response = await fetch(`https://discord.com/api/v10/channels/${channelID}/messages?limit=${count}`, {
         method: "GET",
@@ -63,7 +62,7 @@ async function readMessages(count: number, channelID: string, env: Env): Promise
 }
 
 
-async function sendMessage(message: string, channelID: string, env: Env): Promise<any> {
+export async function sendMessage(message: string, channelID: string, env: Env): Promise<any> {
     const response = await fetch(`https://discord.com/api/v10/channels/${channelID}/messages`, {
         method: "POST",
         headers: {
@@ -77,7 +76,7 @@ async function sendMessage(message: string, channelID: string, env: Env): Promis
 }
 
 
-async function editMessage(messageID: string, newMessage: string, channelID: string, env: Env): Promise<any> {
+export async function editMessage(messageID: string, newMessage: string, channelID: string, env: Env): Promise<any> {
     const response = await fetch(`https://discord.com/api/v10/channels/${channelID}/messages/${messageID}`, {
         method: "PATCH",
         headers: {
@@ -91,7 +90,7 @@ async function editMessage(messageID: string, newMessage: string, channelID: str
 }
 
 
-async function deleteMessage(messageID: string, channelID: string, env: Env) {
+export async function deleteMessage(messageID: string, channelID: string, env: Env) {
     const response = await fetch(`https://discord.com/api/v10/channels/${channelID}/messages/${messageID}`, {
         method: "DELETE",
         headers: {
@@ -102,7 +101,7 @@ async function deleteMessage(messageID: string, channelID: string, env: Env) {
 }
 
 
-async function banUser(userID: string, env: Env): Promise<any> {
+export async function banUser(userID: string, env: Env): Promise<any> {
     const response = await fetch(`https://discord.com/api/v10/guilds/${env.DISCORD_GUILD_ID}/bans/${userID}`, {
         method: "PUT",
         headers: {
@@ -114,7 +113,7 @@ async function banUser(userID: string, env: Env): Promise<any> {
 }
 
 
-async function createRole(name: string, position: number, env: Env): Promise<any> {
+export async function createRole(name: string, position: number, env: Env): Promise<any> {
     if (env.DISCORD_GUILD_ID === "0") {return null;}
     const response = await fetch(`https://discord.com/api/v10/guilds/${env.DISCORD_GUILD_ID}/roles`, {
         method: "POST",
@@ -138,7 +137,7 @@ async function createRole(name: string, position: number, env: Env): Promise<any
 }
 
 
-async function getAllRoles(env: Env): Promise<any[]> {
+export async function getAllRoles(env: Env): Promise<any[]> {
     const response = await fetch(`https://discord.com/api/v10/guilds/${env.DISCORD_GUILD_ID}/roles`, {
         headers: {
             "Authorization": `Bot ${env.DISCORD_TOKEN}`
@@ -149,7 +148,7 @@ async function getAllRoles(env: Env): Promise<any[]> {
 }
 
 
-async function getRolePosition(roleID: string, env: Env): Promise<number> {
+export async function getRolePosition(roleID: string, env: Env): Promise<number> {
     if (env.DISCORD_GUILD_ID === "0") {return 0;}
     const roles = await getAllRoles(env);
     const role = roles.find(r => r.id === roleID);
@@ -158,7 +157,7 @@ async function getRolePosition(roleID: string, env: Env): Promise<number> {
 }
 
 
-async function getUsersWithRole(roleID: string, env: Env): Promise<any[]> {
+export async function getUsersWithRole(roleID: string, env: Env): Promise<any[]> {
     let members = [];
     let after = "0";
 
@@ -179,7 +178,7 @@ async function getUsersWithRole(roleID: string, env: Env): Promise<any[]> {
 }
 
 
-async function getRoles(userID: string, env: Env): Promise<string[]> {
+export async function getRoles(userID: string, env: Env): Promise<string[]> {
     if (env.DISCORD_GUILD_ID === "0") return [];
     const response = await fetch(`https://discord.com/api/v10/guilds/${env.DISCORD_GUILD_ID}/members/${userID}`, {
         method: "GET",
@@ -192,7 +191,7 @@ async function getRoles(userID: string, env: Env): Promise<string[]> {
 }
 
 
-async function giveRole(userID: string, roleID: string, env: Env): Promise<any> {
+export async function giveRole(userID: string, roleID: string, env: Env): Promise<any> {
     if (env.DISCORD_GUILD_ID === "0") {return null;}
     const response = await fetch(`https://discord.com/api/v10/guilds/${env.DISCORD_GUILD_ID}/members/${userID}/roles/${roleID}`, {
         method: "PUT",
@@ -204,7 +203,7 @@ async function giveRole(userID: string, roleID: string, env: Env): Promise<any> 
 }
 
 
-async function removeRole(userID: string, roleID: string, env: Env): Promise<any> {
+export async function removeRole(userID: string, roleID: string, env: Env): Promise<any> {
     if (env.DISCORD_GUILD_ID === "0") {return null;}
     const response = await fetch(`https://discord.com/api/v10/guilds/${env.DISCORD_GUILD_ID}/members/${userID}/roles/${roleID}`, {
         method: "DELETE",
@@ -214,6 +213,7 @@ async function removeRole(userID: string, roleID: string, env: Env): Promise<any
     });
     if (!response.ok) {throw new Error(await response.text());}
 }
+<<<<<<< HEAD
 
 
 export async function handleDiscordRequest(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
@@ -451,3 +451,5 @@ export async function handleDiscordUpdate(env: Env, ctx: ExecutionContext) {
         })());
     }
 }
+=======
+>>>>>>> tmp
