@@ -107,7 +107,7 @@ Secret    GOOGLE_SHEET_ID
 
 ### STEP 5: Register the Discord Bot's slash commands
 
-Run to get slash commands:
+Run to get the Discord Bot's slash commands working:
 ```shell
 npx tsx scripts/register-slash-commands.ts InsertDiscordBotTokenHere InsertDiscordBotApplicationIDHere
 ```
@@ -164,4 +164,5 @@ Open a pull request on [GitHub](https://github.com/gabekramirez/Game-Dev-Club-Cl
 - DISCORD BOT INTERACTING: https://docs.discord.com/developers/interactions/receiving-and-responding
 - DISCORD BOT MESSAGING: https://docs.discord.com/developers/resources/channel
 - DISCORD BOT WEBHOOKS: https://pinggy.io/blog/how_to_set_up_and_test_discord_bot_webhook
+- DISCORD BOT MODALS: https://docs.discord.com/developers/components/using-modal-components
 - CRON TRIGGERS: https://developers.cloudflare.com/workers/runtime-apis/handlers/scheduled
