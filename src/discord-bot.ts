@@ -152,7 +152,22 @@ export async function handleDiscordRequest(request: Request, env: Env, ctx: Exec
                         case "edit": {
                             const roleID = subcommandOptions.find(option => option.name === "role")?.value;
                             const roleName = subcommandOptions.find(option => option.name === "role_name")?.value;
-                            const roleColor = subcommandOptions.find(option => option.name === "role_color")?.value;
+                            var roleColor: string | null = subcommandOptions.find(option => option.name === "role_color")?.value;
+                            var roleColorParsed = 0;
+                            if (roleColor != null) {
+                                var error = false;
+                                if (roleColor.charAt(0) === "#") {roleColor = roleColor.slice(1);}
+                                if (roleColor.length != 6) {error = true} else {
+                                    for (var i = 0; i < roleColor.length; i++) {
+                                        if (!"0123456789abcdefABCDEF".includes(roleColor.charAt(i))) {
+                                            error = true;
+                                            break;
+                                        }
+                                    }
+                                }
+                                if (error) {return await discord.slashCommandReply(`"${roleColor}" is not a valide hex color.`, env, interaction);}
+                                roleColorParsed = parseInt(roleColor, 16);
+                            }
                             var region = subcommandOptions.find(option => option.name === "region")?.value;
                             var school = subcommandOptions.find(option => option.name === "school")?.value;
                             var club = subcommandOptions.find(option => option.name === "club")?.value;
@@ -170,6 +185,7 @@ export async function handleDiscordRequest(request: Request, env: Env, ctx: Exec
                             if (clubLink == null) {clubLink = rows[0][1][3];}
                             if (mainContact == null) {mainContact = rows[0][1][4];}
                             if (acronym == null) {acronym = rows[0][1][7];}
+                            await discord.editRole(roleID, roleName, roleColor, env);
                             await sheets.set(`Main!A${index + 2}:H${index + 2}`, env.GOOGLE_SHEET_ID, [[region, school, club, clubLink, mainContact, "In The Discord", roleID, acronym]], env);
                             return await discord.slashCommandReply("Club edited successfully!", env, interaction);
                         }

@@ -226,6 +226,24 @@ export async function getRoles(userID: string, env: Env): Promise<string[]> {
 }
 
 
+export async function editRole(roleID: string, name: string | null, color: number | null, env: Env) {
+    const body: any = {};
+    if (name !== null) body.name = name;
+    if (color !== null) body.color = color;
+    const response = await fetch(`https://discord.com/api/v10/guilds/${env.DISCORD_GUILD_ID}/roles/${roleID}`, {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bot ${env.DISCORD_TOKEN}`
+            },
+            body: JSON.stringify(body)
+        }
+    );
+    if (!response.ok) {throw new Error(await response.text());}
+    return await response.json();
+}
+
+
 export async function giveRole(userID: string, roleID: string, env: Env): Promise<any> {
     if (env.DISCORD_GUILD_ID === "0") {return null;}
     const response = await fetch(`https://discord.com/api/v10/guilds/${env.DISCORD_GUILD_ID}/members/${userID}/roles/${roleID}`, {
