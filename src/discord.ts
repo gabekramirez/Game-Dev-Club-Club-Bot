@@ -4,16 +4,28 @@ import { verifyKey } from "discord-interactions";
 export const MAX_MESSAGE_LENGTH = 2000;
 
 
-export async function verify(request: Request, env: Env): Promise<boolean> {
+export async function verify(request: Request, env: Env): Promise<Response | any> {
     const signature = request.headers.get("X-Signature-Ed25519");
     const timestamp = request.headers.get("X-Signature-Timestamp");
-    if (!signature || !timestamp) return false;
-    const body = await request.clone().text();
-    return verifyKey(body, signature, timestamp, env.DISCORD_PUBLIC_KEY);
+    var isValid;
+    if (!signature || !timestamp) {
+        isValid = false;
+    } else {
+        const body = await request.clone().text();
+        isValid = await verifyKey(body, signature, timestamp, env.DISCORD_PUBLIC_KEY);
+    }
+    if (!isValid) {
+        return new Response("Invalid request signature", {status: 401});
+    }
+    const interaction = await request.json();
+    if (interaction.type === 1) {
+        return Response.json({type: 1});
+    }
+    return interaction;
 }
 
 
-export async function slashCommandReply(message: string, env: Env, interaction: any, deferred: boolean = false): Promise<Response> {
+export async function slashCommandReply(message: string, env: Env, interaction: any = null, deferred: boolean = false): Promise<Response> {
     if (deferred)
     {
         // if deferred, make sure it's wrapped in a ctx.waitUntil((async () => {   })());
@@ -27,6 +39,16 @@ export async function slashCommandReply(message: string, env: Env, interaction: 
     {
         return Response.json({type: 4, data: {content: message, flags: 64}});
     }
+}
+
+
+export async function modal(modalID: string, title: string, components: Array<any>): Promise<Response> {
+    return Response.json({type: 9, data: {custom_id: modalID, title: title, components: components}});
+}
+
+
+export async function ephemeralMessage(components: Array<any>): Promise<Response> {
+    return Response.json({type: 4, data: {flags: 32832, components: components}});
 }
 
 
@@ -175,6 +197,19 @@ export async function getUsersWithRole(roleID: string, env: Env): Promise<any[]>
         after = pageMembers[pageMembers.length - 1].user.id;
     }
     return members.filter(member => member.roles.includes(roleID));
+}
+
+
+export async function getUsername(userID: string, env: Env): Promise<string> {
+    if (env.DISCORD_GUILD_ID === "0") return "";
+    const response = await fetch(`https://discord.com/api/v10/guilds/${env.DISCORD_GUILD_ID}/members/${userID}`, {
+        method: "GET",
+        headers: {
+            "Authorization": `Bot ${env.DISCORD_TOKEN}`
+        }
+    });
+    if (!response.ok) {throw new Error(await response.text());}
+    return (await response.json()).user.username;
 }
 
 
