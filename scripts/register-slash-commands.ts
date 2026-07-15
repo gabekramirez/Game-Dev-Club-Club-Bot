@@ -37,7 +37,7 @@ const SLASH_COMMANDS = [
                     {
                         type: 3,  // STRING
                         name: "role_name",
-                        description: "Club role name",
+                        description: "Role name",
                         required: true
                     },
                     {
@@ -50,6 +50,12 @@ const SLASH_COMMANDS = [
                         type: 3,  // STRING
                         name: "school",
                         description: "School from database",
+                        required: true
+                    },
+                    {
+                        type: 3,  // STRING
+                        name: "club_name",
+                        description: "Club name",
                         required: true
                     }
                 ]
