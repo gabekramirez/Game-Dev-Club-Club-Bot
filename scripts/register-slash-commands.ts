@@ -1,5 +1,17 @@
 const SLASH_COMMANDS = [
     {
+        name: "deleteroles",
+        description: "Delete all club roles (for dev debug purposes only!!!)",
+        options: [
+            {
+                name: "limit",
+                description: "Max number of roles to try deleting in one go",
+                type: 4,  // INTEGER
+                required: true
+            }
+        ]
+    },
+    {
         name: "club",
         description: "Get your club's role!",
         options: [
