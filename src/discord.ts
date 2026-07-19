@@ -2,6 +2,21 @@ import { verifyKey } from "discord-interactions";
 
 
 export const MAX_MESSAGE_LENGTH = 2000;
+export enum Flags {
+    CROSSPOSTED = 1 << 0,
+    IS_CROSSPOST = 1 << 1,
+    SUPPRESS_EMBEDS = 1 << 2,
+    SOURCE_MESSAGE_DELETED = 1 << 3,
+    URGENT = 1 << 4,
+    HAS_THREAD = 1 << 5,
+    EPHEMERAL = 1 << 6,
+    LOADING = 1 << 7,
+    FAILED_TO_MENTION_SOME_ROLES_IN_THREAD = 1 << 8,
+    SUPPRESS_NOTIFICATIONS = 1 << 12,
+    IS_VOICE_MESSAGE = 1 << 13,
+    HAS_SNAPSHOT = 1 << 14,
+    IS_COMPONENTS_V2 = 1 << 15,
+}
 
 
 export async function verify(request: Request, env: Env): Promise<Response | any> {
@@ -32,12 +47,12 @@ export async function slashCommandReply(message: string, env: Env, interaction: 
         return await fetch(`https://discord.com/api/v10/webhooks/${env.DISCORD_APPLICATION_ID}/${interaction.token}`, {
             method: "POST",
             headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({content: message, flags: 64})}
+            body: JSON.stringify({content: message, flags: Flags.EPHEMERAL})}
         );
     }
     else
     {
-        return Response.json({type: 4, data: {content: message, flags: 64}});
+        return Response.json({type: 4, data: {content: message, flags: Flags.EPHEMERAL}});
     }
 }
 
@@ -48,13 +63,13 @@ export async function modal(modalID: string, title: string, components: Array<an
 
 
 export async function ephemeralMessage(components: Array<any>): Promise<Response> {
-    return Response.json({type: 4, data: {flags: 32832, components: components}});
+    return Response.json({type: 4, data: {flags: Flags.EPHEMERAL | Flags.IS_COMPONENTS_V2, components: components}});
 }
 
 
 export async function defferedReply(): Promise<Response>
 {
-    return Response.json({type: 5, data: {flags: 64}});
+    return Response.json({type: 5, data: {flags: Flags.EPHEMERAL}});
 }
 
 
@@ -91,7 +106,7 @@ export async function sendMessage(message: string, channelID: string, env: Env):
             "Content-Type": "application/json",
             "Authorization": `Bot ${env.DISCORD_TOKEN}`
         },
-        body: JSON.stringify({content: message})
+        body: JSON.stringify({content: message, flags: Flags.SUPPRESS_EMBEDS})
     });
     if (!response.ok) {throw new Error(await response.text());}
     return response.json();
@@ -105,7 +120,7 @@ export async function editMessage(messageID: string, newMessage: string, channel
             "Content-Type": "application/json",
             "Authorization": `Bot ${env.DISCORD_TOKEN}`
         },
-        body: JSON.stringify({content: newMessage})
+        body: JSON.stringify({content: newMessage, flags: Flags.SUPPRESS_EMBEDS})
     });
     if (!response.ok) {throw new Error(await response.text());}
     return response.json();
@@ -156,6 +171,19 @@ export async function createRole(name: string, position: number, env: Env): Prom
         body: JSON.stringify([{id: responseJson.id, position: position}])
     });
     return responseJson;
+}
+
+
+export async function deleteRole(roleID: string, env: Env): Promise<Response> {
+    const response = await fetch(`https://discord.com/api/v10/guilds/${env.DISCORD_GUILD_ID}/roles/${roleID}`, {
+            method: "DELETE",
+            headers: {
+                Authorization: `Bot ${env.DISCORD_TOKEN}`
+            }
+        }
+    );
+    if (!response.ok) {throw new Error(await response.text());}
+    return response;
 }
 
 
@@ -213,7 +241,7 @@ export async function getUsername(userID: string, env: Env): Promise<string> {
 }
 
 
-export async function getRoles(userID: string, env: Env): Promise<string[]> {
+export async function getUserRoles(userID: string, env: Env): Promise<string[]> {
     if (env.DISCORD_GUILD_ID === "0") return [];
     const response = await fetch(`https://discord.com/api/v10/guilds/${env.DISCORD_GUILD_ID}/members/${userID}`, {
         method: "GET",
