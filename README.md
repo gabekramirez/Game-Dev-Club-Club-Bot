@@ -1,8 +1,8 @@
 # Game-Dev-Club-Club-Bot
 
-Discord Bot for the Game Dev Club Club (GDCC), a club of game development clubs.
+Discord Bot for the Game Dev Club Club (GDCC), a club of game development clubs
 
-The bot runs remotely on a Cloudflare Worker and is automatically deployed from this GitHub repository at *no cost*.
+The bot runs remotely on a Cloudflare Worker and is automatically deployed from this GitHub repository at *no cost*
 
 
 
@@ -33,9 +33,9 @@ The bot runs remotely on a Cloudflare Worker and is automatically deployed from 
 
 ### 1. Prerequisites
 
-- Send me (@ninwu) a DM on Discord about wanting to contribute and I will invite you to be a collaborator on this repo and send you the service account JSON.
+- Send me (@ninwu) a DM on Discord about wanting to contribute and I will invite you to be a collaborator on this repo and send you the service account JSON
 - Install the required software: [git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) | [npm](https://docs.npmjs.com/cli/v9/configuring-npm/install)
-- Create a [Cloudflare](https://dash.cloudflare.com/login) account and login to it.
+- Create a [Cloudflare](https://dash.cloudflare.com/login) account and login to it
 - Make a copy of the Schools List Google sheet for testing and share it with editor access to `game-dev-club-club-bot@game-dev-club-club-bot.iam.gserviceaccount.com`
 
 ### 2. Clone the GitHub Repository
@@ -152,8 +152,7 @@ npx wrangler tail --env dev
 ### 1. Create your own branch
 
 Before making any changes, create a branch for the feature or bug you're
-working on.
-
+working on:
 ```shell
 git checkout main
 git pull origin main
@@ -161,34 +160,32 @@ git checkout -b your-branch-name
 git push -u origin your-branch-name
 ```
 
-> **TIP:** Give your branch a descriptive name, such as
-> `add-role-command` or `fix-modal-bug`. If your branch is for a specific GitHub issue, it's common to include the issue number in the branch name, for example `42-add-role-command` or `issue-42-fix-modal-bug`.
+> **TIP:** Give your branch a descriptive name, such as `add-role-command` or `fix-modal-bug`
+>
+> If your branch is for a specific GitHub issue, it's common to include the issue number in the branch name, for example: `42-add-role-command` or `issue-42-fix-modal-bug`
 
 ### 2. Save your work
 
-Commit your changes and push them to your branch on GitHub.
-
+Commit your changes and push them to your branch on GitHub
 ```shell
 git add .
 git commit -m "Describe your changes"
 git push
 ```
 
-Because of the `-u` flag above, you can simply use `git push` instead of
-specifying the branch name each time.
+> **NOTE:** Because of the `-u` flag above, you can simply use `git push` instead of
+specifying the branch name each time
 
 ### 3. Keep your branch up to date
 
 If other people have pushed changes to your branch, update your local
 copy with:
-
 ```shell
 git pull --rebase
 ```
 
 If you want to incorporate the latest changes from `main` into your
 branch:
-
 ```shell
 git fetch origin
 git rebase origin/main
@@ -196,9 +193,9 @@ git rebase origin/main
 
 ### 4. If Git says "failed to push some refs"
 
-Your local branch is behind the version on GitHub. Update it, then push
-again:
+This means that your local branch is behind the version on GitHub
 
+Update it, then push again:
 ```shell
 git pull --rebase
 git push
