@@ -47,7 +47,7 @@ cd Game-Dev-Club-Club-Bot
 npm install
 ```
 
-> **NOTE:** Whenever you pull changes from GitHub, it is good to run `npm install` again in case any dependencies have changed
+> **Tip:** Whenever you pull changes from GitHub, it is good to run `npm install` again in case any dependencies have changed
 
 ### 3. Create Cloudflare Worker
 
@@ -61,7 +61,7 @@ Deploy Worker:
 npx wrangler deploy --env dev
 ```
 
-> **NOTE:** You will have to rerun the shell command above every time you wish to update your worker with new code
+> **Note:** You will have to rerun the shell command above every time you wish to update your worker with new code
 
 ### 4. Create Discord Bot
 
@@ -134,7 +134,9 @@ Run this in the directory of your local repository to get slash commands from th
 npx tsx scripts/register-slash-commands.ts InsertDiscordBotTokenHere InsertDiscordBotApplicationIDHere
 ```
 
-> **NOTE:** You will have to redo this whenever you want to update slash commands
+> **Warning:** Replace the placeholder values before running this command
+
+> **Note:** You will have to redo this whenever you want to update slash commands
 
 
 
@@ -160,7 +162,7 @@ git checkout -b your-branch-name
 git push -u origin your-branch-name
 ```
 
-> **TIP:** Give your branch a descriptive name, such as `add-role-command` or `fix-modal-bug`
+> **Tip:** Give your branch a descriptive name, such as `add-role-command` or `fix-modal-bug`
 >
 > If your branch is for a specific GitHub issue, it's common to include the issue number in the branch name, for example: `42-add-role-command` or `issue-42-fix-modal-bug`
 
@@ -173,8 +175,8 @@ git commit -m "Describe your changes"
 git push
 ```
 
-> **NOTE:** Because of the `-u` flag above, you can simply use `git push` instead of
-specifying the branch name each time
+> **Note:** You're able to use `git push` here instead of
+specifying the branch name because of the `-u` flag from before
 
 ### 3. Keep your branch up to date
 
