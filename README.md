@@ -19,9 +19,10 @@ The bot runs remotely on a Cloudflare Worker and is automatically deployed from 
 - [For those new to GitHub](#for-those-new-to-github)
   - [1. Create your own branch](#1-create-your-own-branch)
   - [2. Save your work](#2-save-your-work)
-  - [3. Keep your branch up to date](#3-keep-your-branch-up-to-date)
-  - [4. If Git says "failed to push some refs"](#4-if-git-says-failed-to-push-some-refs)
-  - [5. Open a Pull Request](#5-open-a-pull-request)
+  - [3. Change Branches](#3-change-branches)
+  - [4. Keep your branch up to date](#4-keep-your-branch-up-to-date)
+  - [5. If Git says "failed to push some refs"](#5-if-git-says-failed-to-push-some-refs)
+  - [6. Open a Pull Request](#6-open-a-pull-request)
 - [Useful Resources](#useful-resources)
   - [1. Cloudflare](#1-cloudflare)
   - [2. Discord](#2-discord)
@@ -110,7 +111,7 @@ Secret    GOOGLE_SHEET_ID
   - Copy the Role ID of the role above all of the club roles into `DISCORD_ROLE_POSITION_END` (or 0 for none)
   - Copy the Role ID of the `Auto Ban` role into `DISCORD_ROLE_AUTO_BAN` (or 0 for none)
 - Finally:
-  - Copy the Google API JSON that I gave you at the start into `GCP_SERVICE_ACCOUNT`
+  - Copy the Google API JSON that I gave you at [the start](#1-prerequisites) into `GCP_SERVICE_ACCOUNT`
   - Copy the ID of the Google Sheet you made for testing (part of the URL after `spreadsheets/d/` and before the next `/` after that) into `GOOGLE_SHEET_ID`
 - In [Cloudflare](https://dash.cloudflare.com)
   - Click on `Deploy`
@@ -175,25 +176,45 @@ git commit -m "Describe your changes"
 git push
 ```
 
-> **Note:** You're able to use `git push` here instead of
-specifying the branch name because of the `-u` flag from before
+> **Note:** You're able to use `git push` here instead of specifying the branch name because of the `-u` flag from before
 
-### 3. Keep your branch up to date
+### 3. Change branches
 
-If other people have pushed changes to your branch, update your local
-copy with:
+Before switching branches, save any changes you do not want to lose
+
+If your changes are complete, follow [Save your work](#2-save-your-work) above
+
+If your changes are incomplete and you are not ready to commit them yet, temporarily store them with:
+```shell
+git stash
+```
+
+You can restore stashed changes later with:
+```shell
+git stash pop
+```
+
+Update your local copy of the branch you want to switch to and switch to it:
+```shell
+git fetch origin
+git checkout branch-name
+git pull
+```
+
+### 4. Keep your branch up to date
+
+If other people have pushed changes to your branch, update your local copy with:
 ```shell
 git pull --rebase
 ```
 
-If you want to incorporate the latest changes from `main` into your
-branch:
+If you want to incorporate the latest changes from `main` into your branch:
 ```shell
 git fetch origin
 git rebase origin/main
 ```
 
-### 4. If Git says "failed to push some refs"
+### 5. If Git says "failed to push some refs"
 
 This means that your local branch is behind the version on GitHub
 
@@ -203,10 +224,9 @@ git pull --rebase
 git push
 ```
 
-### 5. Open a Pull Request
+### 6. Open a Pull Request
 
-When you're finsished with your feature or fix, open a pull request on GitHub so your changes can
-be reviewed and merged into the project:
+When you're finsished with your feature or fix, open a pull request on GitHub so your changes can be reviewed and merged into the project:
 
 https://github.com/gabekramirez/Game-Dev-Club-Club-Bot/compare
 
