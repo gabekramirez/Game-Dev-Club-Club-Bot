@@ -21,7 +21,7 @@ export async function set(range: string, spreadsheet: string, values: any[][], e
     const oauth = new GoogleAuth(googleAuth, ['https://www.googleapis.com/auth/spreadsheets']);
     const accessToken = await oauth.getGoogleAuthToken();
 
-    const response = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheet}/values/${range}?valueInputOption=USER_ENTERED`, {
+    const response = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheet}/values/${range}?valueInputOption=RAW`, {
         method: "PUT",
         headers: {Authorization: `Bearer ${accessToken}`, "Content-Type": "application/json"},
         body: JSON.stringify({values})
@@ -36,7 +36,7 @@ export async function append(range: string, spreadsheet: string, values: any[][]
     const oauth = new GoogleAuth(googleAuth, ['https://www.googleapis.com/auth/spreadsheets']);
     const accessToken = await oauth.getGoogleAuthToken();
 
-    const response = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheet}/values/${range}:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS`, {
+    const response = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheet}/values/${range}:append?valueInputOption=RAW&insertDataOption=INSERT_ROWS`, {
         method: "POST",
         headers: {Authorization: `Bearer ${accessToken}`, "Content-Type": "application/json"},
         body: JSON.stringify({values})

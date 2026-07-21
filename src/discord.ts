@@ -138,6 +138,19 @@ export async function deleteMessage(messageID: string, channelID: string, env: E
 }
 
 
+export async function getUsername(userID: string, env: Env): Promise<string> {
+    if (env.DISCORD_GUILD_ID === "0") return "";
+    const response = await fetch(`https://discord.com/api/v10/guilds/${env.DISCORD_GUILD_ID}/members/${userID}`, {
+        method: "GET",
+        headers: {
+            "Authorization": `Bot ${env.DISCORD_TOKEN}`
+        }
+    });
+    if (!response.ok) {throw new Error(await response.text());}
+    return (await response.json()).user.username;
+}
+
+
 export async function banUser(userID: string, env: Env): Promise<any> {
     const response = await fetch(`https://discord.com/api/v10/guilds/${env.DISCORD_GUILD_ID}/bans/${userID}`, {
         method: "PUT",
@@ -174,6 +187,24 @@ export async function createRole(name: string, position: number, env: Env): Prom
 }
 
 
+export async function editRole(roleID: string, name: string | null, color: number | null, env: Env) {
+    const body: any = {};
+    if (name !== null) body.name = name;
+    if (color !== null) body.color = color;
+    const response = await fetch(`https://discord.com/api/v10/guilds/${env.DISCORD_GUILD_ID}/roles/${roleID}`, {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bot ${env.DISCORD_TOKEN}`
+            },
+            body: JSON.stringify(body)
+        }
+    );
+    if (!response.ok) {throw new Error(await response.text());}
+    return await response.json();
+}
+
+
 export async function deleteRole(roleID: string, env: Env): Promise<Response> {
     const response = await fetch(`https://discord.com/api/v10/guilds/${env.DISCORD_GUILD_ID}/roles/${roleID}`, {
             method: "DELETE",
@@ -195,6 +226,15 @@ export async function getAllRoles(env: Env): Promise<any[]> {
     });
     if (!response.ok) throw new Error(await response.text());
     return await response.json()
+}
+
+
+export async function getRole(roleID: string, env: Env): Promise<any | null> {
+    if (env.DISCORD_GUILD_ID === "0") {return null;}
+    const roles = await getAllRoles(env);
+    const role = roles.find(r => r.id === roleID);
+    if (!role) {return null;}
+    return role;
 }
 
 
@@ -228,19 +268,6 @@ export async function getUsersWithRole(roleID: string, env: Env): Promise<any[]>
 }
 
 
-export async function getUsername(userID: string, env: Env): Promise<string> {
-    if (env.DISCORD_GUILD_ID === "0") return "";
-    const response = await fetch(`https://discord.com/api/v10/guilds/${env.DISCORD_GUILD_ID}/members/${userID}`, {
-        method: "GET",
-        headers: {
-            "Authorization": `Bot ${env.DISCORD_TOKEN}`
-        }
-    });
-    if (!response.ok) {throw new Error(await response.text());}
-    return (await response.json()).user.username;
-}
-
-
 export async function getUserRoles(userID: string, env: Env): Promise<string[]> {
     if (env.DISCORD_GUILD_ID === "0") return [];
     const response = await fetch(`https://discord.com/api/v10/guilds/${env.DISCORD_GUILD_ID}/members/${userID}`, {
@@ -254,25 +281,7 @@ export async function getUserRoles(userID: string, env: Env): Promise<string[]> 
 }
 
 
-export async function editRole(roleID: string, name: string | null, color: number | null, env: Env) {
-    const body: any = {};
-    if (name !== null) body.name = name;
-    if (color !== null) body.color = color;
-    const response = await fetch(`https://discord.com/api/v10/guilds/${env.DISCORD_GUILD_ID}/roles/${roleID}`, {
-            method: "PATCH",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bot ${env.DISCORD_TOKEN}`
-            },
-            body: JSON.stringify(body)
-        }
-    );
-    if (!response.ok) {throw new Error(await response.text());}
-    return await response.json();
-}
-
-
-export async function giveRole(userID: string, roleID: string, env: Env): Promise<any> {
+export async function giveUserRole(userID: string, roleID: string, env: Env): Promise<any> {
     if (env.DISCORD_GUILD_ID === "0") {return null;}
     const response = await fetch(`https://discord.com/api/v10/guilds/${env.DISCORD_GUILD_ID}/members/${userID}/roles/${roleID}`, {
         method: "PUT",
@@ -284,7 +293,7 @@ export async function giveRole(userID: string, roleID: string, env: Env): Promis
 }
 
 
-export async function removeRole(userID: string, roleID: string, env: Env): Promise<any> {
+export async function removeUserRole(userID: string, roleID: string, env: Env): Promise<any> {
     if (env.DISCORD_GUILD_ID === "0") {return null;}
     const response = await fetch(`https://discord.com/api/v10/guilds/${env.DISCORD_GUILD_ID}/members/${userID}/roles/${roleID}`, {
         method: "DELETE",

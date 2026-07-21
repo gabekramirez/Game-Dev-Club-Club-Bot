@@ -20,13 +20,33 @@ async function parseColor(color: string): Promise<number | null> {
 }
 
 
-async function isClubRole(roleID: string, env: Env, inSheets: boolean): Promise<boolean> {
-    var clubRoles = [];
+async function isClubRole(roleID: string, env: Env): Promise<boolean> {
     const position = await discord.getRolePosition(roleID, env);
-    if (inSheets) {clubRoles = (await sheets.get("Main!G:G", env.GOOGLE_SHEET_ID, env)).slice(1).map(row => row[0]);}
-    return (roleID != null && (!inSheets || clubRoles.includes(roleID)) &&
+    return (roleID != null &&
             position > (await discord.getRolePosition(env.DISCORD_ROLE_POSITION_START, env)) &&
-            position < (await discord.getRolePosition(env.DISCORD_ROLE_POSITION_END, env)))
+            position < (await discord.getRolePosition(env.DISCORD_ROLE_POSITION_END, env)));
+}
+
+
+async function setWorkspace(userID: string, values: any[], env: Env) {
+    console.log(values);
+    values = [userID, values.length].concat(values).map(value => [value]);
+    await sheets.set("Main!Z2:Z2", env.GOOGLE_SHEET_ID, [[Date.now()]], env);
+    const queryResultClub = (await sheets.get("Main!Z:Z", env.GOOGLE_SHEET_ID, env)).slice(1);
+    const queryClubIndex = queryResultClub.findIndex(row => row[0] === userID);
+    if (queryClubIndex != -1) {
+        const length = queryResultClub[queryClubIndex + 1][0];
+        await sheets.set(`Main!Z${queryClubIndex}:Z${queryClubIndex + length + 2}`, env.GOOGLE_SHEET_ID, Array(length).fill([""]), env);
+    }
+    await sheets.append("Main!Z:Z", env.GOOGLE_SHEET_ID, values, env);
+}
+
+
+async function getWorkspace(userID: string, length: number, env: Env): Promise<any[]> {
+    const queryResultClub = (await sheets.get("Main!Z:Z", env.GOOGLE_SHEET_ID, env)).slice(1);
+    const queryClubIndex = queryResultClub.findIndex(row => row[0] === userID);
+    const queryClub = queryResultClub.slice(queryClubIndex + 2, queryClubIndex + length + 2).map(row => row == undefined ? null : row[0]);
+    return queryClub;
 }
 
 
@@ -47,12 +67,14 @@ export async function handleDiscordRequest(request: Request, env: Env, ctx: Exec
             switch (command) {
 
                 case "deleteroles": {
+                    const runnerRoles = await discord.getUserRoles(interaction.member.user.id, env);
+                    if (!runnerRoles.includes(env.DISCORD_ROLE_STAFF)) {return await discord.slashCommandReply(`You need <@&${env.DISCORD_ROLE_STAFF}> to use this!`, env, interaction);}
                     const limit = interaction.data.options.find(option => option.name === "limit")?.value;
                     const roles = await discord.getAllRoles(env);
                     var rolesDeleted = 0;
                     for (const role of roles)
                     {
-                        if (await isClubRole(role.id, env, false)) {
+                        if (await isClubRole(role.id, env)) {
                             discord.deleteRole(role.id, env);
                             rolesDeleted += 1;
                         }
@@ -62,29 +84,30 @@ export async function handleDiscordRequest(request: Request, env: Env, ctx: Exec
                 }
 
                 case "club": {
-                    const roleID = interaction.data.options.find(option => option.name === "role")?.value;
+                    const userID = interaction.member.user.id;
+                    const roleID1 = interaction.data.options == null ? null : interaction.data.options.find(option => option.name === "role1")?.value;
+                    const roleID2 = interaction.data.options == null ? null : interaction.data.options.find(option => option.name === "role2")?.value;
+                    const roleID3 = interaction.data.options == null ? null : interaction.data.options.find(option => option.name === "role3")?.value;
                     ctx.waitUntil((async () => {
                         try {
-                            const roleID = interaction.data.options[0].value;
                             if (env.DISCORD_ROLE_POSITION_START === "0") {throw new Error("Missing DISCORD_ROLE_POSITION_START");}
                             if (env.DISCORD_ROLE_POSITION_END === "0") {throw new Error("Missing DISCORD_ROLE_POSITION_END");}
-                            const clubRoles = (await sheets.get("Main!G:G", env.GOOGLE_SHEET_ID, env)).slice(1).map(row => row[0]);
-                            if (await isClubRole(roleID, env, true)) {
-                                const oldRoles = (await discord.getUserRoles(interaction.member.user.id, env)).filter(role => clubRoles.includes(role));
-                                for (var role of oldRoles) {
-                                    discord.removeRole(interaction.member.user.id, role, env);
+                            if (roleID1 != null && !(await isClubRole(roleID1, env))) {return await discord.slashCommandReply(`Nice try! <@&${roleID1}> is not a valid club role.`, env, interaction, true);}
+                            if (roleID2 != null && !(await isClubRole(roleID2, env))) {return await discord.slashCommandReply(`Nice try! <@&${roleID2}> is not a valid club role.`, env, interaction, true);}
+                            if (roleID3 != null && !(await isClubRole(roleID3, env))) {return await discord.slashCommandReply(`Nice try! <@&${roleID3}> is not a valid club role.`, env, interaction, true);}
+                            const oldRoles = (await discord.getUserRoles(userID, env));
+                            for (const roleID of oldRoles) {
+                                if (await isClubRole(roleID, env)) {
+                                    await discord.removeUserRole(userID, roleID, env);
                                 }
-                                if (oldRoles.includes(roleID)) {
-                                    await discord.slashCommandReply(`You lost role <@&${roleID}> x_x`, env, interaction, true);
-                                } else {
-                                    await discord.giveRole(interaction.member.user.id, roleID, env);
-                                    await discord.slashCommandReply(`Successfully obtained role <@&${roleID}> !`, env, interaction, true);
-                                }
-                            } else {
-                                await discord.slashCommandReply(`Nice try! <@&${roleID}> is not a valid club role.`, env, interaction, true);
                             }
+                            if (roleID1 == null && roleID2 == null && roleID3 == null) {return await discord.slashCommandReply("You lost your club roles x_x", env, interaction, true);}
+                            if (roleID1 != null) {await discord.giveUserRole(userID, roleID1, env);}
+                            if (roleID2 != null) {await discord.giveUserRole(userID, roleID2, env);}
+                            if (roleID3 != null) {await discord.giveUserRole(userID, roleID3, env);}
+                            await discord.slashCommandReply("Successfully obtained club roles!", env, interaction, true);
                         } catch (err) {
-                            await discord.slashCommandReply(`Error giving role <@&${roleID}>. Please report to admin. O_O`, env, interaction, true);
+                            await discord.slashCommandReply("Error giving roles. Please report to admin. O_O", env, interaction, true);
                         }
                     })());
                     return await discord.defferedReply();
@@ -100,7 +123,7 @@ export async function handleDiscordRequest(request: Request, env: Env, ctx: Exec
                         } else if (roles.includes(env.DISCORD_ROLE_STAFF)) {
                             return await discord.slashCommandReply(`<@${userID}> already has the <@&${env.DISCORD_ROLE_STAFF}> role :P`, env, interaction);
                         } else {
-                            await discord.giveRole(userID, env.DISCORD_ROLE_STAFF, env);
+                            await discord.giveUserRole(userID, env.DISCORD_ROLE_STAFF, env);
                             return await discord.slashCommandReply(`Successfully gave <@${userID}> the <@&${env.DISCORD_ROLE_STAFF}> role!`, env, interaction);
                         }
                     } catch (err) {
@@ -125,20 +148,12 @@ export async function handleDiscordRequest(request: Request, env: Env, ctx: Exec
                             if (roleFound != null) {return await discord.slashCommandReply(`<@&${roleFound.id}> already exists.`, env, interaction);}
                             // parse hex color
                             var roleColorParsed = roleColor != null ? await parseColor(roleColor) : null;
-                            if (roleColorParsed == null) {return await discord.slashCommandReply(`"${roleColor}" is not a valide hex color.`, env, interaction);}
+                            if (roleColorParsed == null) {return await discord.slashCommandReply(`"${roleColor}" is not a valid hex color.`, env, interaction);}
                             // check if club already has a role
                             const queryResult = (await sheets.get("Main!B:H", env.GOOGLE_SHEET_ID, env));
                             const index = queryResult.map((row, index) => row[0] == school && row[1] == club ? index : null).filter(row => row != null).at(0);
-                            if (index != null) {return await discord.slashCommandReply(`Club is already associated with role <@&${queryResult[index][5]}>`, env, interaction);}
-                            // write to workspace
-                            await sheets.set(`Main!Z2:Z2`, env.GOOGLE_SHEET_ID, [[Date.now()]], env);
-                            const queryResultClub = (await sheets.get("Main!Z:Z", env.GOOGLE_SHEET_ID, env)).slice(1);
-                            const queryClubIndex = queryResultClub.findIndex(row => row[0] === interaction.member.user.id);
-                            if (queryClubIndex === -1) {
-                                await sheets.append("Main!Z:Z", env.GOOGLE_SHEET_ID, [[interaction.member.user.id], [roleName], [roleColorParsed], [school], [club]], env);
-                            } else {
-                                await sheets.set(`Main!Z${queryClubIndex + 2}:Z${queryClubIndex + 6}`, env.GOOGLE_SHEET_ID, [[interaction.member.user.id], [roleName], [roleColorParsed], [school], [club]], env);
-                            }
+                            if (index != null) {return await discord.slashCommandReply(`Club is already associated with role <@&${queryResult[index][5]}> - Did you mean to use "/clublist edit" ?`, env, interaction);}
+                            await setWorkspace(interaction.member.user.id, [roleName, roleColorParsed, school, club], env);
                             return await discord.modal("clublist_create", "Add New Club", [
                                 {
                                     type: 18,  // Label
@@ -181,29 +196,89 @@ export async function handleDiscordRequest(request: Request, env: Env, ctx: Exec
                             const roleName = subcommandOptions.find(option => option.name === "role_name")?.value;
                             const roleColor: string | null = subcommandOptions.find(option => option.name === "role_color")?.value;
                             const roleColorParsed = roleColor != null ? await parseColor(roleColor) : null;
-                            if (roleColor != null && roleColorParsed == null) {return await discord.slashCommandReply(`"${roleColor}" is not a valide hex color.`, env, interaction);}
-                            var region = subcommandOptions.find(option => option.name === "region")?.value;
-                            var school = subcommandOptions.find(option => option.name === "school")?.value;
-                            var club = subcommandOptions.find(option => option.name === "club")?.value;
-                            var clubLink = subcommandOptions.find(option => option.name === "club_link")?.value;
-                            if (clubLink != "" && !clubLink.startsWith("https://")) {clubLink = `https://${clubLink}`}
-                            var mainContact = subcommandOptions.find(option => option.name === "main_contact")?.value;
-                            if (mainContact != null) {mainContact = await discord.getUsername(mainContact, env);}
-                            var acronym = subcommandOptions.find(option => option.name === "acronym")?.value;
-                            const rows = (await sheets.get("Main!A:H", env.GOOGLE_SHEET_ID, env)).slice(1).map((row, index) => row[6] === roleID ? [index, row] : null).filter(row => row != null);
-                            const clubs = rows.map(row => row[1][2]);
-                            if (rows.length === 0) {return await discord.slashCommandReply(`<@&${roleID}> not found. in Google sheets. WIP: registering it to sheets`, env, interaction);}  // TODO: register role with a club
-                            if (rows.length > 1) {return await discord.slashCommandReply(`Please specify a club\n${clubs}`, env, interaction);}  // TODO: change this to whole thing to a club selection and a modal
-                            const index: number = rows[0][0];
-                            if (region == null) {region = rows[0][1][0];}
-                            if (school == null) {school = rows[0][1][1];}
-                            if (club == null) {club = rows[0][1][2];}
-                            if (clubLink == null) {clubLink = rows[0][1][3];}
-                            if (mainContact == null) {mainContact = rows[0][1][4];}
-                            if (acronym == null) {acronym = rows[0][1][7];}
+                            if (roleColor != null && roleColorParsed == null) {return await discord.slashCommandReply(`"${roleColor}" is not a valid hex color.`, env, interaction);}
+                            const roleFound = (await discord.getAllRoles(env)).find(role => role.name === roleName && role.id !== roleID);
+                            if (roleFound != null) {return await discord.slashCommandReply(`<@&${roleFound.id}> already exists.`, env, interaction);}
                             await discord.editRole(roleID, roleName, roleColorParsed, env);
-                            await sheets.set(`Main!A${index + 2}:H${index + 2}`, env.GOOGLE_SHEET_ID, [[region, school, club, clubLink, mainContact, "In The Discord", roleID, acronym]], env);
-                            return await discord.slashCommandReply("Club edited successfully!", env, interaction);
+                            const role = await discord.getRole(roleID, env);
+                            const rows = (await sheets.get("Main!A:H", env.GOOGLE_SHEET_ID, env)).slice(1).map((row, index) => row[6] === roleID ? [index, row] : null).filter(row => row != null);
+                            if (rows.length === 0) {  // role isn't registered to any clubs
+                                await setWorkspace(interaction.member.user.id, [role.name, role.color ?? "", "", "", "", "", ""], env);
+                                return await discord.modal("clublist_create", "Add New Club", [
+                                    {
+                                        type: 18,
+                                        label: "School",
+                                        component: {
+                                            type: 4,
+                                            custom_id: "school",
+                                            style: 1
+                                        }
+                                    },
+                                    {
+                                        type: 18,
+                                        label: "Club Name",
+                                        component: {
+                                            type: 4,
+                                            custom_id: "club_name",
+                                            style: 1
+                                        }
+                                    },
+                                    {
+                                        type: 18,
+                                        label: "Acronym",
+                                        description: "Acronym to put at the end of usernames",
+                                        component: {
+                                            type: 4,
+                                            custom_id: "acronym",
+                                            style: 1,
+                                            required: false
+                                        }
+                                    },
+                                    {
+                                        type: 18,
+                                        label: "Link",
+                                        description: "Club website",
+                                        component: {
+                                            type: 4,
+                                            custom_id: "club_link",
+                                            style: 1,
+                                            required: false
+                                        }
+                                    },
+                                    {
+                                        type: 18,
+                                        label: "Main Contact",
+                                        component: {
+                                            type: 5,
+                                            custom_id: "contact",
+                                            required: false
+                                        }
+                                    }
+                                ]);
+                            } else {
+                                const clubs = rows.map(row => row[1][2]);
+                                clubs.push("__CREATE_NEW__");
+                                return await discord.ephemeralMessage([
+                                    {
+                                        type: 10,
+                                        content: "Select which club to edit or create a new club"
+                                    },
+                                    {
+                                        type: 1,
+                                        components: [
+                                            {
+                                                type: 3,
+                                                custom_id: "clublist_edit_select_club",
+                                                placeholder: "Choose a club...",
+                                                options: clubs.map(club => ({
+                                                    label: club === "__CREATE_NEW__" ? "Create New Club" : club,
+                                                    value: club
+                                                }))
+                                            }
+                                        ]
+                                    }
+                                ]);
+                            }
                         }
                     }
                 }
@@ -225,21 +300,153 @@ export async function handleDiscordRequest(request: Request, env: Env, ctx: Exec
         // MESSAGE COMPONENTS
         else if (interaction.type === 3) {
             if (!interaction.member.roles.includes(env.DISCORD_ROLE_STAFF)) {return await discord.slashCommandReply(`You need <@&${env.DISCORD_ROLE_STAFF}> to use this!`, env, interaction);}
-            const queryResult = (await sheets.get("Main!B:C", env.GOOGLE_SHEET_ID, env)).slice(1);
-            const queryResultClub = (await sheets.get("Main!Z:Z", env.GOOGLE_SHEET_ID, env)).slice(1);
-            const queryClubIndex = queryResultClub.findIndex(row => row[0] === interaction.member.user.id);
-            const queryClub = queryResultClub.slice(queryClubIndex, queryClubIndex + 5);
-            const school = queryClub[3][0];
-            const club = queryClub[4] != undefined ? queryClub[4][0] : "";
-            const region = interaction.data.values[0];
-            const index = queryResult.findIndex(row => row[0] === school && row[1] === club);
-            ctx.waitUntil((async () => {
-                await sheets.set(`Main!A${index + 2}:A${index + 2}`, env.GOOGLE_SHEET_ID, [[region]], env)
-            })());
-            return Response.json({type: 7, data: {components: [{
-                type: 10,  // Text Display
-                content: "Updated region successfully!"
-            }]}});
+            switch (interaction.data.custom_id) {
+                case "region": {
+                    const queryResult = (await sheets.get("Main!B:C", env.GOOGLE_SHEET_ID, env)).slice(1);
+                    const queryClub = await getWorkspace(interaction.member.user.id, 5, env);
+                    const school = queryClub[2];
+                    const club = queryClub[3] != null ? queryClub[3] : "";
+                    const region = interaction.data.values[0];
+                    const index = queryResult.findIndex(row => row[0] === school && row[1] === club);
+                    ctx.waitUntil((async () => {
+                        await sheets.set(`Main!A${index + 2}:A${index + 2}`, env.GOOGLE_SHEET_ID, [[region]], env)
+                    })());
+                    return Response.json({type: 7, data: {components: [{
+                        type: 10,  // Text Display
+                        content: "Updated region successfully!"
+                    }]}});
+                }
+                case "clublist_edit_select_club": {
+                    const club = interaction.data.values[0];
+                    const queryClub = await getWorkspace(interaction.member.user.id, 5, env);
+                    const roleName = queryClub[0];
+                    const roleColor = queryClub[1];
+                    const school = queryClub[2];
+                    const queryResult = (await sheets.get("Main!A:H", env.GOOGLE_SHEET_ID, env)).slice(1);
+                    const index = queryResult.findIndex(row => row[1] === school && row[2] === club);
+                    var acronym = "";
+                    var clubLink = "";
+                    if (index != -1) {
+                        if (queryResult[index][7] != null) {acronym = queryResult[index][7];}
+                        if (queryResult[index][3] != null) {clubLink = queryResult[index][3];}
+                    }
+                    if (club === "__CREATE_NEW__") {
+                        await setWorkspace(interaction.member.user.id, [roleName, roleColor, school, club, "", "", ""], env);
+                        return await discord.modal("clublist_create", "Add New Club", [
+                            {
+                                type: 18,
+                                label: "School",
+                                component: {
+                                    type: 4,
+                                    custom_id: "school",
+                                    style: 1
+                                }
+                            },
+                            {
+                                type: 18,
+                                label: "Club Name",
+                                component: {
+                                    type: 4,
+                                    custom_id: "club_name",
+                                    style: 1,
+                                    required: false
+                                }
+                            },
+                            {
+                                type: 18,
+                                label: "Acronym",
+                                component: {
+                                    type: 4,
+                                    custom_id: "acronym",
+                                    style: 1,
+                                    required: false
+                                }
+                            },
+                            {
+                                type: 18,
+                                label: "Link",
+                                component: {
+                                    type: 4,
+                                    custom_id: "club_link",
+                                    style: 1,
+                                    required: false
+                                }
+                            },
+                            {
+                                type: 18,
+                                label: "Main Contact",
+                                component: {
+                                    type: 5,
+                                    custom_id: "contact",
+                                    required: false
+                                }
+                            }
+                        ]);
+                    } else {
+                        await setWorkspace(interaction.member.user.id, [roleName, roleColor, school, club, "", "", ""], env);
+                        return await discord.modal("clublist_edit", "Edit Club", [
+                            {
+                                type: 18, // Label
+                                label: "School",
+                                description: "School this club belongs to",
+                                component: {
+                                    type: 4, // Text Input
+                                    custom_id: "school",
+                                    style: 1, // Short
+                                    value: school
+                                }
+                            },
+                            {
+                                type: 18, // Label
+                                label: "Club Name",
+                                description: "Leave blank to use the school name",
+                                component: {
+                                    type: 4, // Text Input
+                                    custom_id: "club_name",
+                                    style: 1,
+                                    value: club,
+                                    required: false
+                                }
+                            },
+                            {
+                                type: 18, // Label
+                                label: "Acronym",
+                                description: "Acronym to append to members' usernames",
+                                component: {
+                                    type: 4,
+                                    custom_id: "acronym",
+                                    style: 1,
+                                    value: acronym,
+                                    required: false
+                                }
+                            },
+                            {
+                                type: 18, // Label
+                                label: "Link",
+                                description: "https:// link associated with the club",
+                                component: {
+                                    type: 4,
+                                    custom_id: "club_link",
+                                    style: 1,
+                                    value: clubLink,
+                                    placeholder: "https://...",
+                                    required: false
+                                }
+                            },
+                            {
+                                type: 18, // Label
+                                label: "Main Contact",
+                                description: "Select the club's primary contact",
+                                component: {
+                                    type: 5, // User Select
+                                    custom_id: "contact",
+                                    required: false
+                                }
+                            }
+                        ]);
+                    }
+                }
+            }
         }
 
 
@@ -251,23 +458,21 @@ export async function handleDiscordRequest(request: Request, env: Env, ctx: Exec
 
             switch (modalID) {
                 case "clublist_create": {
-                    const queryResultClub = (await sheets.get("Main!Z:Z", env.GOOGLE_SHEET_ID, env)).slice(1);
-                    const queryClubIndex = queryResultClub.findIndex(row => row[0] === interaction.member.user.id);
-                    const queryClub = queryResultClub.slice(queryClubIndex, queryClubIndex + 5);
-                    const roleName = queryClub[1][0];
-                    const roleColorParsed = queryClub[2][0];
-                    const school = queryClub[3][0];
-                    const club = queryClub[4][0];
+                    const queryClub = await getWorkspace(interaction.member.user.id, 4, env);
+                    const roleName = queryClub[0];
+                    const roleColorParsed = queryClub[1];
+                    const school = queryClub[2];
+                    const club = queryClub[3];
+                    if (roleName == null || school == null || club == null || club === "Add New Club") {throw new Error("Invalid workspace data!");}
                     const position = await discord.getRolePosition(env.DISCORD_ROLE_POSITION_START, env) + 1;
                     const role = await discord.createRole(roleName, position, env);
                     await discord.editRole(role.id, null, roleColorParsed, env);
-                    const acronym = interaction.data.components[0].component.value;
-                    var clubLink = interaction.data.components[1].component.value;
+                    const acronym = interaction.data.components.find(component => component.component.custom_id === "acronym")?.component.value ?? "";
+                    let clubLink = interaction.data.components.find(component => component.component.custom_id === "club_link")?.component.value ?? "";
                     if (clubLink != "" && !clubLink.startsWith("https://")) {clubLink = `https://${clubLink}`;}
                     var mainContact = "";
-                    const contactUserIDs = interaction.data.components[2].component.values;
+                    const contactUserIDs = interaction.data.components.find(component => component.component.custom_id === "contact")?.component.values ?? [];
                     if (contactUserIDs.length == 1) {mainContact = await discord.getUsername(contactUserIDs[0], env);}
-                    if (club == "Add New Club") {throw new Error("Invalid club name!");}
                     const queryResult = (await sheets.get("Main!B:H", env.GOOGLE_SHEET_ID, env));
                     const index = queryResult.map((row, index) => row[0] == school && row[1] == club ? index : null).filter(row => row != null).at(0);
                     if (index == null) {
@@ -318,6 +523,36 @@ export async function handleDiscordRequest(request: Request, env: Env, ctx: Exec
                         }
                     ]);
                 }
+                case "clublist_edit": {
+                    // get workspace
+                    const queryClub = await getWorkspace(interaction.member.user.id, 7, env);
+                    const school = queryClub[2];
+                    const club = queryClub[3];
+                    // read modal values
+                    const newSchool = interaction.data.components.find(c => c.component.custom_id === "school")?.component.value ?? school;
+                    const newClub = interaction.data.components.find(c => c.component.custom_id === "club_name")?.component.value ?? club;
+                    const acronym = interaction.data.components.find(c => c.component.custom_id === "acronym")?.component.value ?? queryClub[6];
+                    let clubLink = interaction.data.components.find(c => c.component.custom_id === "club_link")?.component.value ?? queryClub[4];
+                    const contactIDs = interaction.data.components.find(c => c.component.custom_id === "contact")?.component.values ?? [];
+                    let contact = queryClub[5];
+                    if (contactIDs.length === 1) {contact = await discord.getUsername(contactIDs[0], env);}
+                    // find the sheet row
+                    const queryResult = (await sheets.get("Main!A:H", env.GOOGLE_SHEET_ID, env)).slice(1);
+                    const index = queryResult.findIndex(row => row[1] === school && row[2] === club);
+                    // update
+                    if (index === -1) {
+                        const roleName = queryClub[0];
+                        console.log(JSON.stringify(await discord.getAllRoles(env)));
+                        const role = (await discord.getAllRoles(env)).find(r => r.name === roleName);
+                        console.log(roleName);
+                        console.log(role);
+                        if (!role) {throw new Error("Role not found.");}
+                        await sheets.append("Main!A:H", env.GOOGLE_SHEET_ID, [["", newSchool, newClub, clubLink, contact, "In The Discord", role.id, acronym]], env);
+                    } else {
+                        await sheets.set(`Main!A${index + 2}:H${index + 2}`, env.GOOGLE_SHEET_ID, [[queryResult[index][0], newSchool, newClub, clubLink, contact, queryResult[index][5], queryResult[index][6], acronym]], env);
+                    }
+                    return await discord.slashCommandReply("Updated club successfully!", env, interaction);
+                }
             }
         }
 
@@ -353,24 +588,29 @@ export async function handleDiscordUpdate(env: Env, ctx: ExecutionContext) {
 
                 // query Google Sheets
                 const queryResult = (await sheets.get("Main!A:H", env.GOOGLE_SHEET_ID, env)).slice(1);
+                const positionStart = await discord.getRolePosition(env.DISCORD_ROLE_POSITION_START, env);
+                const positionEnd = await discord.getRolePosition(env.DISCORD_ROLE_POSITION_END, env);
+                var clubRoles = (await discord.getAllRoles(env)).filter(role => positionStart < role.position && role.position < positionEnd).map(role => role.id);
 
                 // create club list channel text from query result and record club roles
                 // TODO: display club roles not in google sheets and better display for clubs in discord on google sheets but dont have role
                 var text: string = "";
                 var i = 1;
-                var j = -1;
                 for (const row of queryResult) {
-                    j++;
-                    if (!row?.[1] || row[5] != "In The Discord") {
+                    if (row[5] != "In The Discord") {
                         clubs.push(null);
                         roles.push(null);
                         continue;
                     };
-                    clubs.push(row[1]);
-                    roles.push(row[6]);
                     text += `${i}.`;
-                    if (roles[j]) text += ` <@&${roles[j]}>`;
-                    if (!row[3]) {
+                    if (row[6]) {
+                        text += ` <@&${row[6]}>`;
+                    } else {
+                        text += ` [MISSING ROLE]`;
+                    }
+                    if (!row?.[1]) {
+                        text += ` [MISSING CLUB]`;
+                    } else if (!row[3]) {
                         text += ` ${row[1]}`;
                         if (row[2]) {text += ` - ${row[2]}`;}
                     } else if (row[2]) {
@@ -380,6 +620,18 @@ export async function handleDiscordUpdate(env: Env, ctx: ExecutionContext) {
                         text += ` [${row[1]}](${row[3]})`;
                     }
                     text += "\n";
+                    if (!row?.[1]) {
+                        clubs.push(null);
+                        roles.push(null);
+                    } else {
+                        clubs.push(row[1]);
+                        roles.push(row[6]);
+                        clubRoles = clubRoles.filter(roleID => roleID != row[6]);
+                    }
+                    i++;
+                }
+                for (const roleID of clubRoles) {
+                    text += `${i}. <@&${roleID}> [MISSING CLUB]\n`;
                     i++;
                 }
                 text += `\n**GAME DEV CLUB CLUB CLUB LIST - ${i - 1} clubs and counting B)**\n\n**Use /club to get your club's role!**`;

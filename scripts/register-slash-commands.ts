@@ -1,25 +1,34 @@
 const SLASH_COMMANDS = [
-    {
-        name: "deleteroles",
-        description: "Delete all club roles (for dev debug purposes only!!!)",
-        options: [
-            {
-                name: "limit",
-                description: "Max number of roles to try deleting in one go",
-                type: 4,  // INTEGER
-                required: true
-            }
-        ]
-    },
+    // {
+    //     name: "deleteroles",
+    //     description: "Delete all club roles (for dev debug purposes only!!!)",
+    //     options: [
+    //         {
+    //             name: "limit",
+    //             description: "Max number of roles to try deleting in one go",
+    //             type: 4,  // INTEGER
+    //             required: true
+    //         }
+    //     ]
+    // },
     {
         name: "club",
-        description: "Get your club's role!",
+        description: "Get your club roles! (Maximum of 3 - Leave blank for none)",
         options: [
             {
-                name: "role",
-                description: "Your one club from #list-of-clubs | Choosing one you already have removes it",
+                name: "role1",
+                description: "Your club's role from #list-of-clubs",
                 type: 8,  // ROLE
-                required: true
+            },
+            {
+                name: "role2",
+                description: "Your club's role from #list-of-clubs",
+                type: 8,  // ROLE
+            },
+            {
+                name: "role3",
+                description: "Your club's role from #list-of-clubs",
+                type: 8,  // ROLE
             }
         ]
     },
@@ -92,64 +101,7 @@ const SLASH_COMMANDS = [
                         type: 3,  // STRING
                         name: "role_color",
                         description: "Color for your club's role"
-                    },
-                    {
-                        type: 3,  // STRING
-                        name: "school",
-                        description: "School from database"
-                    },
-                    {
-                        type: 3,  // STRING
-                        name: "club",
-                        description: "Club name"
-                    },
-                    {
-                        type: 3,  // STRING
-                        name: "club_link",
-                        description: "https link to associate with the club"
-                    },
-                    {
-                        type: 6,  // USER
-                        name: "main_contact",
-                        description: "Club's main contact"
-                    },
-                    {
-                        type: 3,  // STRING
-                        name: "acronym",
-                        description: "Acronym to put at the end of club members' usernames"
-                    },
-                    {
-                        type: 3,  // STRING
-                        name: "region",
-                        description: "Region that the school is in",
-                        choices: [
-                            {
-                                name: "Other",
-                                value: "Other"
-                            },
-                            {
-                                name: "Northeast",
-                                value: "Northeast"
-                            },
-                            {
-                                name: "Southeast",
-                                value: "Southeast"
-                            },
-                            {
-                                name: "Midwest",
-                                value: "Midwest"
-                            },
-                            {
-                                name: "West",
-                                value: "West"
-                            },
-                            {
-                                name: "Southwest",
-                                value: "Southwest"
-                            }
-                        ]
                     }
-
                 ]
             }
         ]
