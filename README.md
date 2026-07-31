@@ -125,7 +125,7 @@ Secret    GOOGLE_SHEET_ID
   - Click `Save Changes`
   - Go back to `Oath2`
   - Under `Scopes` checkmark `bot` and `applications.commands`
-  - Under `Bot Permissions` checkmark `Manage Roles`, `Ban Members`, `Manage Webhooks`, and `Send Messages`
+  - Under `Bot Permissions` checkmark `Manage Roles`, `Ban Members`, `Manage Nicknames`, `Manage Webhooks`, and `Send Messages`
   - Copy the `Generated URL` at the bottom
   - Open the generated URL in your web browser
   - Authorize the bot and add it to your test server

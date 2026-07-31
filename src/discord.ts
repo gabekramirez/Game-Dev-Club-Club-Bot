@@ -41,8 +41,8 @@ export async function verify(request: Request, env: Env): Promise<Response | any
 }
 
 
-export async function slashCommandReply(message: string, env: Env, interaction: any = null, deferred: boolean = false): Promise<Response> {
-    if (deferred)
+export async function slashCommandReply(message: string, env: Env, interaction: any = null): Promise<Response> {
+    if (interaction !== null)
     {
         // if deferred, make sure it's wrapped in a ctx.waitUntil((async () => {   })());
         return await fetch(`https://discord.com/api/v10/webhooks/${env.DISCORD_APPLICATION_ID}/${interaction.token}`, {
@@ -68,21 +68,11 @@ export async function ephemeralMessage(components: Array<any>, edit: boolean = f
 }
 
 
-export async function editEphemeralMessageByToken(token: string, content: Array<any>, env: Env) {
+export async function editEphemeralMessageByToken(token: string, components: Array<any>, env: Env): Promise<void> {
     await fetch(`https://discord.com/api/v10/webhooks/${env.DISCORD_APPLICATION_ID}/${token}/messages/@original`, {
         method: "PATCH",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            flags: Flags.EPHEMERAL | Flags.IS_COMPONENTS_V2,
-            components: [
-                {
-                    type: 10,
-                    content: "Club updated successfully! [1/2]"
-                }
-            ]
-        })
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({flags: Flags.EPHEMERAL | Flags.IS_COMPONENTS_V2, components: components})
     });
 }
 
@@ -153,6 +143,41 @@ export async function deleteMessage(messageID: string, channelID: string, env: E
         headers: {
             "Authorization": `Bot ${env.DISCORD_TOKEN}`
         }
+    });
+    if (!response.ok) {throw new Error(await response.text());}
+}
+
+
+export async function getServerOwner(env: Env): Promise<string> {
+    const response = await fetch(
+        `https://discord.com/api/v10/guilds/${env.DISCORD_GUILD_ID}`,
+        {
+            headers: {Authorization: `Bot ${env.DISCORD_TOKEN}`}
+        }
+    );
+    if (!response.ok) throw new Error(await response.text());
+    return (await response.json()).owner_id;
+}
+
+
+export async function getNickname(userID: string, env: Env): Promise<string> {
+    if (env.DISCORD_GUILD_ID === "0") return "";
+    const response = await fetch(`https://discord.com/api/v10/guilds/${env.DISCORD_GUILD_ID}/members/${userID}`, {
+        method: "GET",
+        headers: {"Authorization": `Bot ${env.DISCORD_TOKEN}`}
+    });
+    if (!response.ok) {throw new Error(await response.text());}
+    const member = await response.json();
+    return member.nick ?? member.user.username;
+}
+
+
+export async function setNickname(userID: string, nickname: string, env: Env): Promise<void> {
+    if (env.DISCORD_GUILD_ID === "0") return;
+    const response = await fetch(`https://discord.com/api/v10/guilds/${env.DISCORD_GUILD_ID}/members/${userID}`, {
+        method: "PATCH",
+        headers: {"Authorization": `Bot ${env.DISCORD_TOKEN}`, "Content-Type": "application/json"},
+        body: JSON.stringify({nick: nickname})
     });
     if (!response.ok) {throw new Error(await response.text());}
 }
