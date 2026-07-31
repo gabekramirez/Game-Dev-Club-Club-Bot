@@ -1,3 +1,4 @@
+import type {Env, ExecutionContext, ScheduledController} from "./type-hints.ts";
 import { handleDiscordRequest, handleDiscordUpdate } from "./discord-bot.ts";
 
 
@@ -14,7 +15,7 @@ export default {
                 return new Response("NOT FOUND", {status: 404});
         }
     },
-    async scheduled(controller: ScheduledController, env: Env, ctx: ExecutionContext) {
+    async scheduled(_controller: ScheduledController, env: Env, ctx: ExecutionContext) {
         ctx.waitUntil(handleDiscordUpdate(env, ctx));
     }
 };

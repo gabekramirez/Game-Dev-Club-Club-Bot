@@ -13,22 +13,13 @@ const SLASH_COMMANDS = [
     // },
     {
         name: "club",
-        description: "Get your club roles! (Maximum of 3 - Leave blank for none)",
+        description: "Add or remove a club role!",
         options: [
             {
-                name: "role1",
-                description: "Your club's role from #list-of-clubs",
+                name: "role",
+                description: "Club role from #list-of-clubs",
                 type: 8,  // ROLE
-            },
-            {
-                name: "role2",
-                description: "Your club's role from #list-of-clubs",
-                type: 8,  // ROLE
-            },
-            {
-                name: "role3",
-                description: "Your club's role from #list-of-clubs",
-                type: 8,  // ROLE
+                required: true
             }
         ]
     },

@@ -1,11 +1,14 @@
+import type {Env, ExecutionContext} from "./type-hints.ts";
 import * as discord from "./discord.ts";
 import * as sheets from "./sheets.ts";
 
 
-async function getClublistModal(session: any[], index: number, env: Env): Promise<any> {
-    const roleID = session[7];
-    const role = await discord.getRole(roleID, env);
-    const color = "#" + role.color.toString(16).padStart(6, "0");
+const CLUB_ROLE_LIMIT = 3;
+
+
+async function getClublistModal(session: any[], index: number): Promise<any> {
+    const roleName = session[10];
+    const roleColor = session[11];
     const school = session[2] ? session[2] : "";
     const club = session[3] ? session[3] : "";
     const acronym = session[8] ? session[8] : "";
@@ -20,7 +23,7 @@ async function getClublistModal(session: any[], index: number, env: Env): Promis
                 type: 4, // Text Input
                 custom_id: "role_name",
                 style: 1, // Short
-                value: role.name
+                value: roleName
             }
         },
         {
@@ -31,7 +34,7 @@ async function getClublistModal(session: any[], index: number, env: Env): Promis
                 type: 4, // Text Input
                 custom_id: "role_color",
                 style: 1, // Short
-                value: color,
+                value: roleColor,
                 required: false
             }
         },
@@ -100,7 +103,8 @@ async function getClublistModal(session: any[], index: number, env: Env): Promis
 
 
 async function getRegionMessage(sessionID: string, env: Env): Promise<any | null> {
-    const session = (await sheets.get("DiscordBot!A:N", env.GOOGLE_SHEET_ID, env)).find(row => row[0] === sessionID);
+    const BOT_SHEET = env.GOOGLE_SHEET_ID_BOT ? env.GOOGLE_SHEET_ID_BOT : env.GOOGLE_SHEET_ID
+    const session = (await sheets.get("DiscordBot!A:N", BOT_SHEET, env)).find(row => row[0] === sessionID);
     if (session === undefined) {return null;}
     return [
         {
@@ -184,6 +188,7 @@ async function isClubRole(roleID: string, env: Env): Promise<boolean> {
 
 
 export async function handleDiscordRequest(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+    const BOT_SHEET = env.GOOGLE_SHEET_ID_BOT ? env.GOOGLE_SHEET_ID_BOT : env.GOOGLE_SHEET_ID
     try {
         // This is for setting up Interactions Endpoint URL
         const interaction = await discord.verify(request, env);
@@ -195,14 +200,15 @@ export async function handleDiscordRequest(request: Request, env: Env, ctx: Exec
 
         // SLASH COMMANDS
         if (interaction.type === 2) {
-            const command = interaction.data?.name;
+            const command: string = interaction.data?.name;
+            const commandOptions: {name: string; value?: any;}[] = interaction.data.options
 
             switch (command) {
 
                 case "deleteroles": {
                     const runnerRoles = await discord.getUserRoles(interaction.member.user.id, env);
                     if (!runnerRoles.includes(env.DISCORD_ROLE_STAFF)) {return await discord.slashCommandReply(`You need <@&${env.DISCORD_ROLE_STAFF}> to use this!`, env, interaction);}
-                    const limit = interaction.data.options.find(option => option.name === "limit")?.value;
+                    const limit = commandOptions.find(option => option.name === "limit")?.value;
                     const roles = await discord.getAllRoles(env);
                     var rolesDeleted = 0;
                     for (const role of roles)
@@ -217,37 +223,37 @@ export async function handleDiscordRequest(request: Request, env: Env, ctx: Exec
                 }
 
                 case "club": {
-                    const userID = interaction.member.user.id;
-                    const roleID1 = interaction.data.options == null ? null : interaction.data.options.find(option => option.name === "role1")?.value;
-                    const roleID2 = interaction.data.options == null ? null : interaction.data.options.find(option => option.name === "role2")?.value;
-                    const roleID3 = interaction.data.options == null ? null : interaction.data.options.find(option => option.name === "role3")?.value;
+                    const roleID = commandOptions.find(option => option.name === "role")?.value;
                     ctx.waitUntil((async () => {
                         try {
                             if (env.DISCORD_ROLE_POSITION_START === "0") {throw new Error("Missing DISCORD_ROLE_POSITION_START");}
                             if (env.DISCORD_ROLE_POSITION_END === "0") {throw new Error("Missing DISCORD_ROLE_POSITION_END");}
-                            if (roleID1 != null && !(await isClubRole(roleID1, env))) {return await discord.slashCommandReply(`Nice try! <@&${roleID1}> is not a valid club role.`, env, interaction, true);}
-                            if (roleID2 != null && !(await isClubRole(roleID2, env))) {return await discord.slashCommandReply(`Nice try! <@&${roleID2}> is not a valid club role.`, env, interaction, true);}
-                            if (roleID3 != null && !(await isClubRole(roleID3, env))) {return await discord.slashCommandReply(`Nice try! <@&${roleID3}> is not a valid club role.`, env, interaction, true);}
+                            if (!(await isClubRole(roleID, env))) {return await discord.slashCommandReply(`Nice try! <@&${roleID}> is not a valid club role :P`, env, interaction, true);}
+                            const userID = interaction.member.user.id;
                             const oldRoles = (await discord.getUserRoles(userID, env));
-                            for (const roleID of oldRoles) {
-                                if (await isClubRole(roleID, env)) {
-                                    await discord.removeUserRole(userID, roleID, env);
+                            var clubRoleCount = 0;
+                            for (const oldRoleID of oldRoles) {
+                                if (await isClubRole(oldRoleID, env)) {
+                                    if (oldRoleID === roleID) {
+                                        await discord.removeUserRole(userID, roleID, env);
+                                        return await discord.slashCommandReply(`You lost <@&${roleID}> x_x`, env, interaction, true);
+                                    }
+                                    clubRoleCount++;
                                 }
                             }
-                            if (roleID1 == null && roleID2 == null && roleID3 == null) {return await discord.slashCommandReply("You lost your club roles x_x", env, interaction, true);}
-                            if (roleID1 != null) {await discord.giveUserRole(userID, roleID1, env);}
-                            if (roleID2 != null) {await discord.giveUserRole(userID, roleID2, env);}
-                            if (roleID3 != null) {await discord.giveUserRole(userID, roleID3, env);}
-                            await discord.slashCommandReply("Successfully obtained club roles!", env, interaction, true);
+                            const countText = clubRoleCount ? `   (${clubRoleCount + (clubRoleCount >= CLUB_ROLE_LIMIT ? 0 : 1)}/${CLUB_ROLE_LIMIT} max club roles)` : "";
+                            if (clubRoleCount >= CLUB_ROLE_LIMIT) {return await discord.slashCommandReply(`Please remove a club role before adding more!${countText}`, env, interaction, true);}
+                            await discord.giveUserRole(userID, roleID, env);
+                            await discord.slashCommandReply(`Successfully obtained <@&${roleID}> !${countText}`, env, interaction, true);
                         } catch (err) {
-                            await discord.slashCommandReply("Error giving roles. Please report to admin. O_O", env, interaction, true);
+                            await discord.slashCommandReply(`Error giving role <@&${roleID}> . Please report to admin. O_O`, env, interaction, true);
                         }
                     })());
                     return await discord.defferedReply();
                 }
 
                 case "staff": {
-                    const userID = interaction.data.options.find(option => option.name === "user")?.value;
+                    const userID = commandOptions.find(option => option.name === "user")?.value;
                     try {
                         const runnerRoles = await discord.getUserRoles(interaction.member.user.id, env);
                         const roles = await discord.getUserRoles(userID, env);
@@ -265,31 +271,43 @@ export async function handleDiscordRequest(request: Request, env: Env, ctx: Exec
                 }
 
                 case "clublist": {
-                    // TODO: change how clublist works: enter one role in at a time | ephemeral messages asking to add role, set role, or clear roles if you already have a club role | when you add/set a club role ask to change your username to add the school's acronym | still limit to 3 club roles max
                     const runnerRoles = await discord.getUserRoles(interaction.member.user.id, env);
                     if (!runnerRoles.includes(env.DISCORD_ROLE_STAFF)) {return await discord.slashCommandReply(`You need <@&${env.DISCORD_ROLE_STAFF}> to use this!`, env, interaction);}
-                    var clubRoles: string[] = []
+                    const queryResult = (await sheets.get("Main!A:H", env.GOOGLE_SHEET_ID, env)).slice(1);
+                    var clubRoles: string[] = [];
+                    var clubs = [];
                     for (const roleID of runnerRoles) {
                         if (await isClubRole(roleID, env)) {
                             clubRoles.push(roleID);
+                            const rolesClubs = queryResult.filter(row => row[6] == roleID).map((row, index) => ({
+                                label: row[2] ? `${row[1]} - ${row[2]}` : row[1],
+                                value: `${row[6]}__${index}`
+                            }));
+                            for (const club of rolesClubs) {
+                                clubs.push(club);
+                            }
                         }
                     }
                     if (clubRoles.length === 0) {return await discord.slashCommandReply("Please give yourself the club role for your school with `/club` first!", env, interaction);}
+                    if (clubs.length === 0) {return await discord.slashCommandReply("Couldn't find associated club. Please contact Discord Team to get this fixed.", env, interaction);}
                     const sessionID = crypto.randomUUID();
-                    if (clubRoles.length === 1) {
-                        const queryResult = (await sheets.get("Main!A:H", env.GOOGLE_SHEET_ID, env)).slice(1);
+                    if (clubs.length === 1) {
                         var row = queryResult.find(row => row[6] === clubRoles[0]);
                         if (row === undefined) {return await discord.slashCommandReply("Couldn't find associated club. Please contact Discord Team to get this fixed.", env, interaction);}
-                        while (row.length < 12) {row.push("");}
+                        while (row.length < 8) {row.push("");}
                         // A:N [sessionID, region, school, club, clubLink, mainContact, "In The Discord", roleID, acronym, roleIndex, roleName, roleColor, interactionToken, timeStamp]
-                        const session = [sessionID, ...row, Date.now()];
-                        await sheets.append("DiscordBot!A:A", env.GOOGLE_SHEET_ID, [session], env);
-                        const modal = await getClublistModal(session, 0, env);
+                        const role = await discord.getRole(row[6], env);
+                        const roleColor = "#" + role.color.toString(16).padStart(6, "0");
+                        const session = [sessionID, ...row, 0, role.name, roleColor, "", Date.now()];
+                        await sheets.append("DiscordBot!A:A", BOT_SHEET, [session], env);
+                        const modal = await getClublistModal(session, 0);
                         return await discord.modal(`clublist_edit_club_1__${sessionID}`, "Edit Club [1/2]", modal);
                     } else {
                         const queryResult = (await sheets.get("Main!A:H", env.GOOGLE_SHEET_ID, env)).slice(1);
                         const rows = queryResult.filter(row => clubRoles.includes(row[6]));
                         if (rows === undefined || rows.length === 0) {return await discord.slashCommandReply("Couldn't find associated club. Please contact Discord Team to get this fixed.", env, interaction);}
+                        const session = [sessionID, ...Array(12).fill(""), Date.now()];
+                        await sheets.append("DiscordBot!A:A", BOT_SHEET, [session], env);
                         return await discord.ephemeralMessage([
                             {
                                 type: 10,
@@ -302,10 +320,7 @@ export async function handleDiscordRequest(request: Request, env: Env, ctx: Exec
                                         type: 3,
                                         custom_id: `clublist_select_club__${sessionID}`,
                                         placeholder: "Choose a club...",
-                                        options: rows.map(row => ({
-                                            label: row[2] ? `${row[1]} - ${row[2]}` : row[1],
-                                            value: row[6]
-                                        }))
+                                        options: clubs
                                     }
                                 ]
                             }
@@ -332,20 +347,32 @@ export async function handleDiscordRequest(request: Request, env: Env, ctx: Exec
             if (!interaction.member.roles.includes(env.DISCORD_ROLE_STAFF)) {return await discord.slashCommandReply(`You need <@&${env.DISCORD_ROLE_STAFF}> to use this!`, env, interaction);}
             const component = interaction.data.custom_id.split("__")[0];
             const sessionID = interaction.data.custom_id.split("__")[1];
-            const queryResult = await sheets.get("DiscordBot!A:N", env.GOOGLE_SHEET_ID, env);
+            const queryResult = await sheets.get("DiscordBot!A:N", BOT_SHEET, env);
             const rowIndex = queryResult.findIndex(row => row[0] === sessionID);
             if (rowIndex === -1) {return await discord.slashCommandReply("Session Expired :/", env, interaction);}
             switch (component) {
+                case "clublist_select_club": {
+                    const roleID = interaction.data.values[0].split("__")[0];
+                    const roleIndex = interaction.data.values[0].split("__")[1];
+                    const row = (await sheets.get("Main!A:H", env.GOOGLE_SHEET_ID, env)).slice(1).filter(row => row[6] === roleID)[roleIndex];
+                    while (row.length < 8) {row.push("");}
+                    const role = await discord.getRole(row[6], env);
+                    const roleColor = "#" + role.color.toString(16).padStart(6, "0");
+                    const session = [sessionID, ...row, roleIndex, role.name, roleColor, interaction.token, Date.now()];
+                    await sheets.set(`DiscordBot!A${rowIndex + 1}:N${rowIndex + 1}`, BOT_SHEET, [session], env);
+                    const modal = await getClublistModal(session, 0);
+                    return await discord.modal(`clublist_edit_club_1__${sessionID}`, "Edit Club [1/2]", modal);
+                }
                 case "clublist_edit_club_region": {
                     const region = interaction.data.values[0];
-                    await sheets.set(`DiscordBot!B${rowIndex + 1}:B${rowIndex + 1}`, env.GOOGLE_SHEET_ID, [[region]], env);
+                    await sheets.set(`DiscordBot!B${rowIndex + 1}:B${rowIndex + 1}`, BOT_SHEET, [[region]], env);
                     const regionMessage = await getRegionMessage(sessionID, env);
                     if (regionMessage === null) {return await discord.slashCommandReply("Session Expired :/", env, interaction);}
                     return await discord.ephemeralMessage(regionMessage, true);
                 }
                 case "clublist_edit_club_continue": {
-                    await sheets.set(`DiscordBot!M${rowIndex + 1}:M${rowIndex + 1}`, env.GOOGLE_SHEET_ID, [[interaction.token]], env);
-                    const modal = await getClublistModal(queryResult[rowIndex], 1, env);
+                    await sheets.set(`DiscordBot!M${rowIndex + 1}:M${rowIndex + 1}`, BOT_SHEET, [[interaction.token]], env);
+                    const modal = await getClublistModal(queryResult[rowIndex], 1);
                     return await discord.modal(`clublist_edit_club_2__${sessionID}`, "Edit Club [2/2]", modal);
                 }
             }
@@ -358,10 +385,13 @@ export async function handleDiscordRequest(request: Request, env: Env, ctx: Exec
             if (!interaction.member.roles.includes(env.DISCORD_ROLE_STAFF)) {return await discord.slashCommandReply(`You need <@&${env.DISCORD_ROLE_STAFF}> to use this!`, env, interaction);}
             const modalID = interaction.data.custom_id.split("__")[0];
             const sessionID = interaction.data.custom_id.split("__")[1];
+            const queryResult = await sheets.get("DiscordBot!A:N", BOT_SHEET, env);
+            const rowIndex = queryResult.findIndex(row => row[0] === sessionID);
+            const session = queryResult[rowIndex];
 
             switch (modalID) {
                 case "clublist_edit_club_1": {
-                    const queryResult = await sheets.get("DiscordBot!A:N", env.GOOGLE_SHEET_ID, env);
+                    const queryResult = await sheets.get("DiscordBot!A:N", BOT_SHEET, env);
                     const rowIndex = queryResult.findIndex(row => row[0] === sessionID);
                     if (rowIndex === -1) {return await discord.slashCommandReply("Session Expired :/", env, interaction);}
                     const roleName = interaction.data.components[0].component.value;
@@ -369,7 +399,7 @@ export async function handleDiscordRequest(request: Request, env: Env, ctx: Exec
                     const school = interaction.data.components[2].component.value;
                     const clubName = interaction.data.components[3].component.value;
                     const acronym = interaction.data.components[4].component.value;
-                    await sheets.set(`DiscordBot!C${rowIndex + 1}:L${rowIndex + 1}`, env.GOOGLE_SHEET_ID, [[
+                    await sheets.set(`DiscordBot!C${rowIndex + 1}:L${rowIndex + 1}`, BOT_SHEET, [[
                         school,
                         clubName,
                         queryResult[rowIndex][4], // keep existing club link
@@ -377,16 +407,31 @@ export async function handleDiscordRequest(request: Request, env: Env, ctx: Exec
                         queryResult[rowIndex][6], // keep existing status
                         queryResult[rowIndex][7], // keep existing role ID
                         acronym,
-                        queryResult[rowIndex][9], // keep existing role index (NOTE: role index is currently unused)
+                        queryResult[rowIndex][9], // keep existing role index
                         roleName,
                         roleColor
                     ]], env);
+
+                    if (session[12] != "") {
+                        await fetch(`https://discord.com/api/v10/webhooks/${env.DISCORD_APPLICATION_ID}/${session[12]}/messages/@original`, {
+                            method: "PATCH",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify({
+                                flags: discord.Flags.EPHEMERAL | discord.Flags.IS_COMPONENTS_V2,
+                                components: [
+                                    {
+                                        type: 10,
+                                        content: "Club chosen!"
+                                    }
+                                ]
+                            })
+                        });
+                    }
                     return await discord.ephemeralMessage(await getRegionMessage(sessionID, env));
                 }
                 case "clublist_edit_club_2": {
-                    const queryResult = await sheets.get("DiscordBot!A:N", env.GOOGLE_SHEET_ID, env);
-                    const rowIndex = queryResult.findIndex(row => row[0] === sessionID);
-                    const session = queryResult[rowIndex];
                     var clubLink = interaction.data.components[0].component.value;
                     var mainContact = interaction.data.components[1].component.value;
 
@@ -400,22 +445,26 @@ export async function handleDiscordRequest(request: Request, env: Env, ctx: Exec
                     // Update session with modal values
                     clubLink = clubLink.startsWith("http") ? clubLink : `https://${clubLink}`
                     mainContact = mainContact ? await discord.getUsername(mainContact, env) : null;
-                    await sheets.set(`DiscordBot!E${rowIndex + 1}:F${rowIndex + 1}`, env.GOOGLE_SHEET_ID, [[
+                    await sheets.set(`DiscordBot!E${rowIndex + 1}:F${rowIndex + 1}`, BOT_SHEET, [[
                         clubLink ?? session[4],
                         mainContact ?? session[5],
                     ]], env);
 
                     // Copy session into Main table
-                    const updatedSession = (await sheets.get("DiscordBot!A:N", env.GOOGLE_SHEET_ID, env)).find(row => row[0] === sessionID);
+                    const updatedSession = (await sheets.get("DiscordBot!A:N", BOT_SHEET, env)).find(row => row[0] === sessionID);
                     if (updatedSession === undefined) {return await discord.slashCommandReply("Session expired :/", env, interaction);}
                     const mainRows = await sheets.get("Main!A:H", env.GOOGLE_SHEET_ID, env);
-                    const mainRowIndex = mainRows.findIndex(row => row[6] === updatedSession[7]);
+                    var roleIndex = session[9];
+                    var mainRowIndex = mainRows.findIndex(row => row[6] === updatedSession[7]);
+                    while (roleIndex > 0) {
+                        mainRowIndex = mainRows.findIndex((row, index) => row[6] === updatedSession[7] && index > mainRowIndex);
+                        roleIndex--;
+                    }
                     if (mainRowIndex === -1) {return await discord.slashCommandReply("Couldn't find club in Main sheet.", env, interaction);}
                     await sheets.set(`Main!A${mainRowIndex + 1}:H${mainRowIndex + 1}`, env.GOOGLE_SHEET_ID, [[...updatedSession.slice(1, 9)]], env);
 
                     // Clear session
-                    console.log(rowIndex);
-                    await sheets.set(`DiscordBot!A${rowIndex + 1}:N${rowIndex + 1}`, env.GOOGLE_SHEET_ID, [Array(14).fill("")], env);
+                    await sheets.set(`DiscordBot!A${rowIndex + 1}:N${rowIndex + 1}`, BOT_SHEET, [Array(14).fill("")], env);
 
                     await fetch(`https://discord.com/api/v10/webhooks/${env.DISCORD_APPLICATION_ID}/${session[12]}/messages/@original`, {
                         method: "PATCH",
@@ -447,13 +496,14 @@ export async function handleDiscordRequest(request: Request, env: Env, ctx: Exec
 
 
 export async function handleDiscordUpdate(env: Env, ctx: ExecutionContext) {
-    const sessions = await sheets.get("DiscordBot!N:N", env.GOOGLE_SHEET_ID, env);
+    const BOT_SHEET = env.GOOGLE_SHEET_ID_BOT ? env.GOOGLE_SHEET_ID_BOT : env.GOOGLE_SHEET_ID
+    const sessions = await sheets.get("DiscordBot!N:N", BOT_SHEET, env);
     const now = Date.now();
     const sessionTimeout = 15 * 60 * 1000;  // 15 minutes
     for (var i = 0; i < sessions.length; i++) {
         const timestamp = Number(sessions[i][0]);
         if (!timestamp || now - timestamp > sessionTimeout) {
-            await sheets.set(`DiscordBot!A${i + 1}:N${i + 1}`, env.GOOGLE_SHEET_ID, [Array(14).fill("")], env);
+            await sheets.set(`DiscordBot!A${i + 1}:N${i + 1}`, BOT_SHEET, [Array(14).fill("")], env);
         }
     }
 
@@ -593,17 +643,22 @@ export async function handleDiscordUpdate(env: Env, ctx: ExecutionContext) {
                         botMessages.push(message);
                     }
                 }
+                var editsLeft = 5;  // Discord rate limits 5 messages / 5 seconds (https://github.com/discord-net/Discord.Net/issues/2375 | https://www.reddit.com/r/discordapp/comments/cbyu20/do_bots_get_ratelimitedstopped_if_they_do_certain)
                 var i = 0;
                 for (; i < botMessages.length; i++) {
                     if (i >= messages.length) {
                         await discord.deleteMessage(botMessages[i].id, env.DISCORD_CLUB_LIST_CHANNEL_ID, env);
                     } else if (botMessages[i].content !== messages[i]) {
+                        if (editsLeft <= 0) {return;}
                         await discord.editMessage(botMessages[i].id, messages[i], env.DISCORD_CLUB_LIST_CHANNEL_ID, env);
+                        editsLeft--;
                     }
                 }
                 for (; i < messages.length; i++) {
+                    if (editsLeft <= 0) {return;}
                     const response = await discord.sendMessage("...", env.DISCORD_CLUB_LIST_CHANNEL_ID, env);
                     await discord.editMessage(response.id, messages[i], env.DISCORD_CLUB_LIST_CHANNEL_ID, env);
+                    editsLeft--;
                 }
             } catch (err) {
                 await discord.sendMessage("Bot error: " + String(err), env.DISCORD_CLUB_LIST_CHANNEL_ID, env);

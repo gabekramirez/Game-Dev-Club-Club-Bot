@@ -1,3 +1,4 @@
+import type {Env} from "./type-hints.ts";
 import GoogleAuth, { GoogleKey } from './google-auth.ts';
 
 
@@ -27,7 +28,7 @@ export async function set(range: string, spreadsheet: string, values: any[][], e
         body: JSON.stringify({values})
     });
     if (!response.ok) {throw new Error(await response.text());}
-    return await response;
+    return response;
 }
 
 
@@ -42,5 +43,5 @@ export async function append(range: string, spreadsheet: string, values: any[][]
         body: JSON.stringify({values})
     });
     if (!response.ok) {throw new Error(await response.text());}
-    return await response;
+    return response;
 }

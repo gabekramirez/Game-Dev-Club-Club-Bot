@@ -1,3 +1,4 @@
+import type {Env} from "./type-hints.ts";
 import { verifyKey } from "discord-interactions";
 
 
@@ -64,6 +65,25 @@ export async function modal(modalID: string, title: string, components: Array<an
 
 export async function ephemeralMessage(components: Array<any>, edit: boolean = false): Promise<Response> {
     return Response.json({type: edit ? 7 : 4, data: {flags: Flags.EPHEMERAL | Flags.IS_COMPONENTS_V2, components: components}});
+}
+
+
+export async function editEphemeralMessageByToken(token: string, content: Array<any>, env: Env) {
+    await fetch(`https://discord.com/api/v10/webhooks/${env.DISCORD_APPLICATION_ID}/${token}/messages/@original`, {
+        method: "PATCH",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            flags: Flags.EPHEMERAL | Flags.IS_COMPONENTS_V2,
+            components: [
+                {
+                    type: 10,
+                    content: "Club updated successfully! [1/2]"
+                }
+            ]
+        })
+    });
 }
 
 

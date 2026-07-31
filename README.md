@@ -90,6 +90,7 @@ Text      DISCORD_GUILD_ID
 Text      DISCORD_CLUB_LIST_CHANNEL_ID
 Text      DISCORD_ROLE_POSITION_START
 Text      DISCORD_ROLE_POSITION_END
+Text      DISCORD_ROLE_STAFF
 Text      DISCORD_ROLE_AUTO_BAN
 Secret    GCP_SERVICE_ACCOUNT
 Secret    GOOGLE_SHEET_ID
@@ -109,6 +110,7 @@ Secret    GOOGLE_SHEET_ID
   - Copy the Channel ID of your club list channel into `DISCORD_CLUB_LIST_CHANNEL_ID` (or 0 for none)
   - Copy the Role ID of the role to insert new club roles above into `DISCORD_ROLE_POSITION_START` (or 0 for none)
   - Copy the Role ID of the role above all of the club roles into `DISCORD_ROLE_POSITION_END` (or 0 for none)
+  - Copy the Role ID of the `Staff Staff` role into `DISCORD_ROLE_STAFF` (or 0 for none)
   - Copy the Role ID of the `Auto Ban` role into `DISCORD_ROLE_AUTO_BAN` (or 0 for none)
 - Finally:
   - Copy the Google API JSON that I gave you at [the start](#1-prerequisites) into `GCP_SERVICE_ACCOUNT`
