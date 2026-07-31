@@ -1,12 +1,24 @@
 const SLASH_COMMANDS = [
+    // {
+    //     name: "deleteroles",
+    //     description: "Delete all club roles (for dev debug purposes only!!!)",
+    //     options: [
+    //         {
+    //             name: "limit",
+    //             description: "Max number of roles to try deleting in one go",
+    //             type: 4,  // INTEGER
+    //             required: true
+    //         }
+    //     ]
+    // },
     {
         name: "club",
-        description: "Get your club's role!",
+        description: "Add or remove a club role!",
         options: [
             {
                 name: "role",
-                description: "Your one club from #list-of-clubs | Choosing one you already have removes it",
-                type: 8,
+                description: "Club role from #list-of-clubs",
+                type: 8,  // ROLE
                 required: true
             }
         ]
@@ -19,10 +31,15 @@ const SLASH_COMMANDS = [
             {
                 name: "user",
                 description: "User to give the Staff Staff role",
-                type: 6,
+                type: 6,  // USER
                 required: true
             }
         ]
+    },
+    {
+        name: "clublist",
+        description: "Edit your club's information",
+        default_member_permissions: "268435456"  // they need Manage Roles permission to see the command
     },
     {
         name: "update",
@@ -48,7 +65,7 @@ async function main() {
         body: JSON.stringify(SLASH_COMMANDS)
     });
     if (!response.ok) {throw new Error(await response.text());}
-    console.log("Registered all commands");
+    console.log("Registered all commands!");
 }
 
 

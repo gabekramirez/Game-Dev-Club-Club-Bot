@@ -37,7 +37,7 @@ The bot runs remotely on a Cloudflare Worker and is automatically deployed from 
 - Send me (@ninwu) a DM on Discord about wanting to contribute and I will invite you to be a collaborator on this repo and send you the service account JSON
 - Install the required software: [git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) | [npm](https://docs.npmjs.com/cli/v9/configuring-npm/install)
 - Create a [Cloudflare](https://dash.cloudflare.com/login) account and login to it
-- Make a copy of the Schools List Google sheet for testing and share it with editor access to `game-dev-club-club-bot@game-dev-club-club-bot.iam.gserviceaccount.com`
+- Make a copy of the Schools List Google sheet for testing, add a `DiscordBot` sheet at the bottom, and share it with editor access to `game-dev-club-club-bot@game-dev-club-club-bot.iam.gserviceaccount.com`
 
 ### 2. Clone the GitHub Repository
 
@@ -90,6 +90,7 @@ Text      DISCORD_GUILD_ID
 Text      DISCORD_CLUB_LIST_CHANNEL_ID
 Text      DISCORD_ROLE_POSITION_START
 Text      DISCORD_ROLE_POSITION_END
+Text      DISCORD_ROLE_STAFF
 Text      DISCORD_ROLE_AUTO_BAN
 Secret    GCP_SERVICE_ACCOUNT
 Secret    GOOGLE_SHEET_ID
@@ -109,6 +110,7 @@ Secret    GOOGLE_SHEET_ID
   - Copy the Channel ID of your club list channel into `DISCORD_CLUB_LIST_CHANNEL_ID` (or 0 for none)
   - Copy the Role ID of the role to insert new club roles above into `DISCORD_ROLE_POSITION_START` (or 0 for none)
   - Copy the Role ID of the role above all of the club roles into `DISCORD_ROLE_POSITION_END` (or 0 for none)
+  - Copy the Role ID of the `Staff Staff` role into `DISCORD_ROLE_STAFF` (or 0 for none)
   - Copy the Role ID of the `Auto Ban` role into `DISCORD_ROLE_AUTO_BAN` (or 0 for none)
 - Finally:
   - Copy the Google API JSON that I gave you at [the start](#1-prerequisites) into `GCP_SERVICE_ACCOUNT`
@@ -123,7 +125,7 @@ Secret    GOOGLE_SHEET_ID
   - Click `Save Changes`
   - Go back to `Oath2`
   - Under `Scopes` checkmark `bot` and `applications.commands`
-  - Under `Bot Permissions` checkmark `Manage Roles`, `Ban Members`, `Manage Webhooks`, and `Send Messages`
+  - Under `Bot Permissions` checkmark `Manage Roles`, `Ban Members`, `Manage Nicknames`, `Manage Webhooks`, and `Send Messages`
   - Copy the `Generated URL` at the bottom
   - Open the generated URL in your web browser
   - Authorize the bot and add it to your test server
