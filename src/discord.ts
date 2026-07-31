@@ -71,7 +71,10 @@ export async function ephemeralMessage(components: Array<any>, edit: boolean = f
 export async function editEphemeralMessageByToken(token: string, components: Array<any>, env: Env): Promise<void> {
     await fetch(`https://discord.com/api/v10/webhooks/${env.DISCORD_APPLICATION_ID}/${token}/messages/@original`, {
         method: "PATCH",
-        headers: {"Content-Type": "application/json"},
+        headers: {
+            "Authorization": `Bot ${env.DISCORD_TOKEN}`,
+            "Content-Type": "application/json"
+        },
         body: JSON.stringify({flags: Flags.EPHEMERAL | Flags.IS_COMPONENTS_V2, components: components})
     });
 }
