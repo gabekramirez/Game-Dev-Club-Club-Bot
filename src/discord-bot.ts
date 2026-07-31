@@ -108,6 +108,10 @@ async function getRegionMessage(sessionID: string, env: Env): Promise<any | null
     if (session === undefined) {return null;}
     return [
         {
+            type: 10,  // Text Display
+            content: "**Edit Club [1/2]\n---------------**"
+        },
+        {
             type: 12,  // Media Gallery
             items: [{media: {url: "https://kajabi-storefronts-production.kajabi-cdn.com/kajabi-storefronts-production/file-uploads/themes/2155149285/settings_images/b41ed6-0fd5-6f-e08a-bbcb352e6_Regions.webp"}}]
         },
@@ -158,6 +162,10 @@ async function getRegionMessage(sessionID: string, env: Env): Promise<any | null
                     custom_id: `clublist_edit_club_continue__${sessionID}`
                 }
             ]
+        },
+        {
+            type: 10,  // Text Display
+            content: "***NOTE:** You must click **Submit** on the next form for changes to be saved!*"
         }
     ];
 }
@@ -512,13 +520,13 @@ export async function handleDiscordRequest(request: Request, env: Env, ctx: Exec
                     // Clear session
                     await sheets.set(`DiscordBot!A${rowIndex + 1}:N${rowIndex + 1}`, BOT_SHEET, [Array(14).fill("")], env);
 
+                    await handleDiscordUpdate(env, ctx);
                     await discord.editEphemeralMessageByToken(session[12], [
                         {
                             type: 10,  // Text Display
                             content: "Club updated successfully! [1/2]"
                         }
                     ], env);
-
                     return await discord.slashCommandReply("Club updated successfully! [2/2]", env);
                 }
             }
