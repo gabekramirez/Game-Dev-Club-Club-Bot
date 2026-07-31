@@ -37,7 +37,7 @@ The bot runs remotely on a Cloudflare Worker and is automatically deployed from 
 - Send me (@ninwu) a DM on Discord about wanting to contribute and I will invite you to be a collaborator on this repo and send you the service account JSON
 - Install the required software: [git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) | [npm](https://docs.npmjs.com/cli/v9/configuring-npm/install)
 - Create a [Cloudflare](https://dash.cloudflare.com/login) account and login to it
-- Make a copy of the Schools List Google sheet for testing and share it with editor access to `game-dev-club-club-bot@game-dev-club-club-bot.iam.gserviceaccount.com`
+- Make a copy of the Schools List Google sheet for testing, add a `DiscordBot` sheet at the bottom, and share it with editor access to `game-dev-club-club-bot@game-dev-club-club-bot.iam.gserviceaccount.com`
 
 ### 2. Clone the GitHub Repository
 
