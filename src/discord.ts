@@ -62,8 +62,8 @@ export async function modal(modalID: string, title: string, components: Array<an
 }
 
 
-export async function ephemeralMessage(components: Array<any>): Promise<Response> {
-    return Response.json({type: 4, data: {flags: Flags.EPHEMERAL | Flags.IS_COMPONENTS_V2, components: components}});
+export async function ephemeralMessage(components: Array<any>, edit: boolean = false): Promise<Response> {
+    return Response.json({type: edit ? 7 : 4, data: {flags: Flags.EPHEMERAL | Flags.IS_COMPONENTS_V2, components: components}});
 }
 
 

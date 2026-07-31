@@ -47,64 +47,8 @@ const SLASH_COMMANDS = [
     },
     {
         name: "clublist",
-        description: "Manage list of clubs",
-        default_member_permissions: "268435456",
-        options: [
-            {
-                type: 1,
-                name: "create",
-                description: "Create a new club role",
-                options: [
-                    {
-                        type: 3,  // STRING
-                        name: "role_name",
-                        description: "Role name",
-                        required: true
-                    },
-                    {
-                        type: 3,  // STRING
-                        name: "role_color",
-                        description: "Color for your club's role",
-                        required: true
-                    },
-                    {
-                        type: 3,  // STRING
-                        name: "school",
-                        description: "School from database",
-                        required: true
-                    },
-                    {
-                        type: 3,  // STRING
-                        name: "club_name",
-                        description: "Club name",
-                        required: true
-                    }
-                ]
-            },
-            {
-                type: 1,
-                name: "edit",
-                description: "Edit an existing club role",
-                options: [
-                    {
-                        type: 8,  // ROLE
-                        name: "role",
-                        description: "Club role to edit",
-                        required: true
-                    },
-                    {
-                        type: 3,  // STRING
-                        name: "role_name",
-                        description: "Club role name"
-                    },
-                    {
-                        type: 3,  // STRING
-                        name: "role_color",
-                        description: "Color for your club's role"
-                    }
-                ]
-            }
-        ]
+        description: "Edit your club's information",
+        default_member_permissions: "268435456"  // they need Manage Roles permission to see the command
     },
     {
         name: "update",
@@ -130,7 +74,7 @@ async function main() {
         body: JSON.stringify(SLASH_COMMANDS)
     });
     if (!response.ok) {throw new Error(await response.text());}
-    console.log("Registered all commands");
+    console.log("Registered all commands!");
 }
 
 
