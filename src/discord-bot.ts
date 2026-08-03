@@ -303,15 +303,15 @@ export async function handleDiscordRequest(request: Request, env: Env, ctx: Exec
                             const runnerRoles = await discord.getUserRoles(interaction.member.user.id, env);
                             const roles = await discord.getUserRoles(userID, env);
                             if (!runnerRoles.includes(env.DISCORD_ROLE_STAFF)) {
-                                return await discord.slashCommandReply(`You don't even have the <@&${env.DISCORD_ROLE_STAFF}> role yourself >:P`, env);
+                                return await discord.slashCommandReply(`You don't even have the <@&${env.DISCORD_ROLE_STAFF}> role yourself >:P`, env, interaction);
                             } else if (roles.includes(env.DISCORD_ROLE_STAFF)) {
-                                return await discord.slashCommandReply(`<@${userID}> already has the <@&${env.DISCORD_ROLE_STAFF}> role :P`, env);
+                                return await discord.slashCommandReply(`<@${userID}> already has the <@&${env.DISCORD_ROLE_STAFF}> role :P`, env, interaction);
                             } else {
                                 await discord.giveUserRole(userID, env.DISCORD_ROLE_STAFF, env);
-                                return await discord.slashCommandReply(`Successfully gave <@${userID}> the <@&${env.DISCORD_ROLE_STAFF}> role!`, env);
+                                return await discord.slashCommandReply(`Successfully gave <@${userID}> the <@&${env.DISCORD_ROLE_STAFF}> role!`, env, interaction);
                             }
                         } catch (err) {
-                            return await discord.slashCommandReply(`Error giving <@${userID}> the <@&${env.DISCORD_ROLE_STAFF}> role.`, env);
+                            return await discord.slashCommandReply(`Error giving <@${userID}> the <@&${env.DISCORD_ROLE_STAFF}> role.`, env, interaction);
                         }
                     })());
                     return discord.defferedReply();
