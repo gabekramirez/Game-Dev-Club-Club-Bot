@@ -43,7 +43,7 @@ const SLASH_COMMANDS = [
     },
     {
         name: "update",
-        description: "Force a server update to run",
+        description: "Discord Bot Update (This is automatically ran once every hour)",
         default_member_permissions: "268435456"  // they need Manage Roles permission to see the command
     }
 ];
