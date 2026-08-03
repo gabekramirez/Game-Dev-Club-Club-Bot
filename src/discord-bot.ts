@@ -213,22 +213,22 @@ export async function handleDiscordRequest(request: Request, env: Env, ctx: Exec
 
             switch (command) {
 
-                case "deleteroles": {
-                    const runnerRoles = await discord.getUserRoles(interaction.member.user.id, env);
-                    if (!runnerRoles.includes(env.DISCORD_ROLE_STAFF)) {return await discord.slashCommandReply(`You need <@&${env.DISCORD_ROLE_STAFF}> to use this!`, env, interaction);}
-                    const limit = commandOptions.find(option => option.name === "limit")?.value;
-                    const roles = await discord.getAllRoles(env);
-                    var rolesDeleted = 0;
-                    for (const role of roles)
-                    {
-                        if (await isClubRole(role.id, env)) {
-                            discord.deleteRole(role.id, env);
-                            rolesDeleted += 1;
-                        }
-                        if (rolesDeleted == limit) {break;}
-                    }
-                    return await discord.slashCommandReply(`Deleted ${rolesDeleted} roles!`, env);
-                }
+                // case "deleteroles": {
+                //     const runnerRoles = await discord.getUserRoles(interaction.member.user.id, env);
+                //     if (!runnerRoles.includes(env.DISCORD_ROLE_STAFF)) {return await discord.slashCommandReply(`You need <@&${env.DISCORD_ROLE_STAFF}> to use this!`, env, interaction);}
+                //     const limit = commandOptions.find(option => option.name === "limit")?.value;
+                //     const roles = await discord.getAllRoles(env);
+                //     var rolesDeleted = 0;
+                //     for (const role of roles)
+                //     {
+                //         if (await isClubRole(role.id, env)) {
+                //             discord.deleteRole(role.id, env);
+                //             rolesDeleted += 1;
+                //         }
+                //         if (rolesDeleted == limit) {break;}
+                //     }
+                //     return await discord.slashCommandReply(`Deleted ${rolesDeleted} roles!`, env);
+                // }
 
                 case "club": {
                     ctx.waitUntil((async () => {
@@ -297,79 +297,99 @@ export async function handleDiscordRequest(request: Request, env: Env, ctx: Exec
                 }
 
                 case "staff": {
-                    const userID = commandOptions.find(option => option.name === "user")?.value;
-                    try {
-                        const runnerRoles = await discord.getUserRoles(interaction.member.user.id, env);
-                        const roles = await discord.getUserRoles(userID, env);
-                        if (!runnerRoles.includes(env.DISCORD_ROLE_STAFF)) {
-                            return await discord.slashCommandReply(`You don't even have the <@&${env.DISCORD_ROLE_STAFF}> role yourself >:P`, env);
-                        } else if (roles.includes(env.DISCORD_ROLE_STAFF)) {
-                            return await discord.slashCommandReply(`<@${userID}> already has the <@&${env.DISCORD_ROLE_STAFF}> role :P`, env);
-                        } else {
-                            await discord.giveUserRole(userID, env.DISCORD_ROLE_STAFF, env);
-                            return await discord.slashCommandReply(`Successfully gave <@${userID}> the <@&${env.DISCORD_ROLE_STAFF}> role!`, env);
+                    ctx.waitUntil((async () => {
+                        const userID = commandOptions.find(option => option.name === "user")?.value;
+                        try {
+                            const runnerRoles = await discord.getUserRoles(interaction.member.user.id, env);
+                            const roles = await discord.getUserRoles(userID, env);
+                            if (!runnerRoles.includes(env.DISCORD_ROLE_STAFF)) {
+                                return await discord.slashCommandReply(`You don't even have the <@&${env.DISCORD_ROLE_STAFF}> role yourself >:P`, env);
+                            } else if (roles.includes(env.DISCORD_ROLE_STAFF)) {
+                                return await discord.slashCommandReply(`<@${userID}> already has the <@&${env.DISCORD_ROLE_STAFF}> role :P`, env);
+                            } else {
+                                await discord.giveUserRole(userID, env.DISCORD_ROLE_STAFF, env);
+                                return await discord.slashCommandReply(`Successfully gave <@${userID}> the <@&${env.DISCORD_ROLE_STAFF}> role!`, env);
+                            }
+                        } catch (err) {
+                            return await discord.slashCommandReply(`Error giving <@${userID}> the <@&${env.DISCORD_ROLE_STAFF}> role.`, env);
                         }
-                    } catch (err) {
-                        return await discord.slashCommandReply(`Error giving <@${userID}> the <@&${env.DISCORD_ROLE_STAFF}> role.`, env);
-                    }
+                    })());
+                    return discord.defferedReply();
                 }
 
                 case "clublist": {
-                    const runnerRoles = await discord.getUserRoles(interaction.member.user.id, env);
-                    if (!runnerRoles.includes(env.DISCORD_ROLE_STAFF)) {return await discord.slashCommandReply(`You need <@&${env.DISCORD_ROLE_STAFF}> to use this!`, env, interaction);}
-                    const queryResult = (await sheets.get("Main!A:H", env.GOOGLE_SHEET_ID, env)).slice(1);
-                    var clubRoles: string[] = [];
-                    var clubs = [];
-                    for (const roleID of runnerRoles) {
-                        if (await isClubRole(roleID, env)) {
-                            clubRoles.push(roleID);
-                            const rolesClubs = queryResult.filter(row => row[6] == roleID).map((row, index) => ({
-                                label: row[2] ? `${row[1]} - ${row[2]}` : row[1],
-                                value: `${row[6]}__${index}`
-                            }));
-                            for (const club of rolesClubs) {
-                                clubs.push(club);
+                    ctx.waitUntil((async () => {
+                        const runnerRoles = await discord.getUserRoles(interaction.member.user.id, env);
+                        if (!runnerRoles.includes(env.DISCORD_ROLE_STAFF)) {return await discord.slashCommandReply(`You need <@&${env.DISCORD_ROLE_STAFF}> to use this!`, env, interaction);}
+                        const queryResult = (await sheets.get("Main!A:H", env.GOOGLE_SHEET_ID, env)).slice(1);
+                        var clubRoles: string[] = [];
+                        var clubs = [];
+                        for (const roleID of runnerRoles) {
+                            if (await isClubRole(roleID, env)) {
+                                clubRoles.push(roleID);
+                                const rolesClubs = queryResult.filter(row => row[6] == roleID).map((row, index) => ({
+                                    label: row[2] ? `${row[1]} - ${row[2]}` : row[1],
+                                    value: `${row[6]}__${index}`
+                                }));
+                                for (const club of rolesClubs) {
+                                    clubs.push(club);
+                                }
                             }
                         }
-                    }
-                    if (clubRoles.length === 0) {return await discord.slashCommandReply("Please give yourself the club role for your school with `/club` first!", env, interaction);}
-                    if (clubs.length === 0) {return await discord.slashCommandReply("Couldn't find associated club. Please contact Discord Team to get this fixed.", env, interaction);}
-                    const sessionID = crypto.randomUUID();
-                    if (clubs.length === 1) {
-                        var row = queryResult.find(row => row[6] === clubRoles[0]);
-                        if (row === undefined) {return await discord.slashCommandReply("Couldn't find associated club. Please contact Discord Team to get this fixed.", env, interaction);}
-                        while (row.length < 8) {row.push("");}
-                        // A:N [sessionID, region, school, club, clubLink, mainContact, "In The Discord", roleID, acronym, roleIndex, roleName, roleColor, interactionToken, timeStamp]
-                        const role = await discord.getRole(row[6], env);
-                        const roleColor = "#" + role.color.toString(16).padStart(6, "0");
-                        const session = [sessionID, ...row, 0, role.name, roleColor, "", Date.now()];
-                        await sheets.append("DiscordBot!A:A", BOT_SHEET, [session], env);
-                        const modal = await getClublistModal(session, 0);
-                        return await discord.modal(`clublist_edit_club_1__${sessionID}`, "Edit Club [1/2]", modal);
-                    } else {
-                        const rows = queryResult.filter(row => clubRoles.includes(row[6]));
-                        if (rows === undefined || rows.length === 0) {return await discord.slashCommandReply("Couldn't find associated club. Please contact Discord Team to get this fixed.", env, interaction);}
-                        const session = [sessionID, ...Array(12).fill(""), Date.now()];
-                        await sheets.append("DiscordBot!A:A", BOT_SHEET, [session], env);
-                        console.log("-_-");
-                        return await discord.ephemeralMessage([
-                            {
-                                type: 10,  // Text Display
-                                content: "Select club"
-                            },
-                            {
-                                type: 1,  // Action Row
-                                components: [
-                                    {
-                                        type: 3,  // String Select
-                                        custom_id: `clublist_select_club__${sessionID}`,
-                                        placeholder: "Choose a club...",
-                                        options: clubs
-                                    }
-                                ]
-                            }
-                        ]);
-                    }
+                        if (clubRoles.length === 0) {return await discord.slashCommandReply("Please give yourself the club role for your school with `/club` first!", env, interaction);}
+                        if (clubs.length === 0) {return await discord.slashCommandReply("Couldn't find associated club. Please contact Discord Team to get this fixed.", env, interaction);}
+                        const sessionID = crypto.randomUUID();
+                        if (clubs.length === 1) {
+                            var row = queryResult.find(row => row[6] === clubRoles[0]);
+                            if (row === undefined) {return await discord.slashCommandReply("Couldn't find associated club. Please contact Discord Team to get this fixed.", env, interaction);}
+                            while (row.length < 8) {row.push("");}
+                            // A:N [sessionID, region, school, club, clubLink, mainContact, "In The Discord", roleID, acronym, roleIndex, roleName, roleColor, interactionToken, timeStamp]
+                            const role = await discord.getRole(row[6], env);
+                            const roleColor = "#" + role.color.toString(16).padStart(6, "0");
+                            const session = [sessionID, ...row, 0, role.name, roleColor, "", Date.now()];
+                            await sheets.append("DiscordBot!A:A", BOT_SHEET, [session], env);
+                            return await discord.editEphemeralMessageByToken(interaction.token, [
+                                {
+                                    type: 10,  // Text Display
+                                    content: "/clublist"
+                                },
+                                {
+                                    type: 1, // Action Row
+                                    components: [
+                                        {
+                                            type: 2, // Button
+                                            style: 1, // Primary
+                                            label: "PRESS START",
+                                            custom_id: `clublist_edit_club_start__${sessionID}`
+                                        }
+                                    ]
+                                },
+                            ], env);
+                        } else {
+                            const rows = queryResult.filter(row => clubRoles.includes(row[6]));
+                            if (rows === undefined || rows.length === 0) {return await discord.slashCommandReply("Couldn't find associated club. Please contact Discord Team to get this fixed.", env, interaction);}
+                            const session = [sessionID, ...Array(12).fill(""), Date.now()];
+                            await sheets.append("DiscordBot!A:A", BOT_SHEET, [session], env);
+                            return await discord.editEphemeralMessageByToken(interaction.token, [
+                                {
+                                    type: 10,  // Text Display
+                                    content: "Select club"
+                                },
+                                {
+                                    type: 1,  // Action Row
+                                    components: [
+                                        {
+                                            type: 3,  // String Select
+                                            custom_id: `clublist_select_club__${sessionID}`,
+                                            placeholder: "Choose a club...",
+                                            options: clubs
+                                        }
+                                    ]
+                                }
+                            ], env);
+                        }
+                    })());
+                    return discord.defferedReply();
                 }
 
                 case "update": {
@@ -438,6 +458,11 @@ export async function handleDiscordRequest(request: Request, env: Env, ctx: Exec
                     const modal = await getClublistModal(session, 0);
                     return await discord.modal(`clublist_edit_club_1__${sessionID}`, "Edit Club [1/2]", modal);
                 }
+                case "clublist_edit_club_start": {
+                    await sheets.set(`DiscordBot!M${rowIndex + 1}:M${rowIndex + 1}`, BOT_SHEET, [[interaction.token]], env);
+                    const modal = await getClublistModal(queryResult[rowIndex], 0);
+                    return await discord.modal(`clublist_edit_club_1__${sessionID}`, "Edit Club [1/2]", modal);
+                }
                 case "clublist_edit_club_region": {
                     const region = interaction.data.values[0];
                     await sheets.set(`DiscordBot!B${rowIndex + 1}:B${rowIndex + 1}`, BOT_SHEET, [[region]], env);
@@ -501,38 +526,42 @@ export async function handleDiscordRequest(request: Request, env: Env, ctx: Exec
                     var clubLink = interaction.data.components[0].component.value;
                     var mainContact = interaction.data.components[1].component.value;
 
-                    // Update Role
-                    const roleID = session[7];
-                    const roleName = session[10] || null;
-                    const roleColorString = session[11] || "";
-                    const roleColor = await parseColor(roleColorString);
-                    await discord.editRole(roleID, roleName, roleColor, env);
+                    try {
+                        // Update Role
+                        const roleID = session[7];
+                        const roleName = session[10] || null;
+                        const roleColorString = session[11] || "";
+                        const roleColor = await parseColor(roleColorString);
+                        await discord.editRole(roleID, roleName, roleColor, env);
 
-                    // Update session with modal values
-                    clubLink = clubLink === "" || clubLink.startsWith("http") ? clubLink : `https://${clubLink}`
-                    mainContact = mainContact ? await discord.getUsername(mainContact, env) : null;
-                    await sheets.set(`DiscordBot!E${rowIndex + 1}:F${rowIndex + 1}`, BOT_SHEET, [[
-                        clubLink ?? session[4],
-                        mainContact ?? session[5],
-                    ]], env);
+                        // Update session with modal values
+                        clubLink = clubLink === "" || clubLink.startsWith("http") ? clubLink : `https://${clubLink}`
+                        mainContact = mainContact ? await discord.getUsername(mainContact, env) : null;
+                        await sheets.set(`DiscordBot!E${rowIndex + 1}:F${rowIndex + 1}`, BOT_SHEET, [[
+                            clubLink ?? session[4],
+                            mainContact ?? session[5],
+                        ]], env);
 
-                    // Copy session into Main table
-                    const updatedSession = (await sheets.get("DiscordBot!A:N", BOT_SHEET, env)).find(row => row[0] === sessionID);
-                    if (updatedSession === undefined) {return await discord.slashCommandReply("Session expired :/", env);}
-                    const mainRows = await sheets.get("Main!A:H", env.GOOGLE_SHEET_ID, env);
-                    var roleIndex = session[9];
-                    var mainRowIndex = mainRows.findIndex(row => row[6] === updatedSession[7]);
-                    while (roleIndex > 0) {
-                        mainRowIndex = mainRows.findIndex((row, index) => row[6] === updatedSession[7] && index > mainRowIndex);
-                        roleIndex--;
-                    }
-                    if (mainRowIndex === -1) {return await discord.slashCommandReply("Couldn't find club in Main sheet.", env);}
-                    await sheets.set(`Main!A${mainRowIndex + 1}:H${mainRowIndex + 1}`, env.GOOGLE_SHEET_ID, [[...updatedSession.slice(1, 9)]], env);
+                        // Copy session into Main table
+                        const updatedSession = (await sheets.get("DiscordBot!A:N", BOT_SHEET, env)).find(row => row[0] === sessionID);
+                        if (updatedSession === undefined) {return await discord.slashCommandReply("Session expired :/", env);}
+                        const mainRows = await sheets.get("Main!A:H", env.GOOGLE_SHEET_ID, env);
+                        var roleIndex = session[9];
+                        var mainRowIndex = mainRows.findIndex(row => row[6] === updatedSession[7]);
+                        while (roleIndex > 0) {
+                            mainRowIndex = mainRows.findIndex((row, index) => row[6] === updatedSession[7] && index > mainRowIndex);
+                            roleIndex--;
+                        }
+                        if (mainRowIndex === -1) {return await discord.slashCommandReply("Couldn't find club in Main sheet.", env);}
+                        await sheets.set(`Main!A${mainRowIndex + 1}:H${mainRowIndex + 1}`, env.GOOGLE_SHEET_ID, [[...updatedSession.slice(1, 9)]], env);
 
-                    // Clear session
-                    await sheets.set(`DiscordBot!A${rowIndex + 1}:N${rowIndex + 1}`, BOT_SHEET, [Array(14).fill("")], env);
+                        // Clear session
+                        await sheets.set(`DiscordBot!A${rowIndex + 1}:N${rowIndex + 1}`, BOT_SHEET, [Array(14).fill("")], env);
+                    } catch (err) {}
 
-                    await handleDiscordUpdate(env, ctx);
+                    ctx.waitUntil((async () => {
+                        await handleDiscordUpdate(env, ctx);
+                    })());
                     await discord.editEphemeralMessageByToken(session[12], [
                         {
                             type: 10,  // Text Display
