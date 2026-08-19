@@ -327,7 +327,7 @@ export async function handleDiscordRequest(request: Request, env: Env, ctx: Exec
                         for (const roleID of runnerRoles) {
                             if (await isClubRole(roleID, env)) {
                                 clubRoles.push(roleID);
-                                const rolesClubs = queryResult.filter(row => row[6] == roleID).map((row, index) => ({
+                                const rolesClubs = queryResult.filter(row => row[5] == "In The Discord" && row[6] == roleID).map((row, index) => ({
                                     label: row[2] ? `${row[1]} - ${row[2]}` : row[1],
                                     value: `${row[6]}__${index}`
                                 }));
@@ -605,8 +605,10 @@ export async function handleDiscordUpdate(env: Env, ctx: ExecutionContext) {
     if (env.DISCORD_CLUB_LIST_CHANNEL_ID !== "0") {
         ctx.waitUntil((async () => {
             try {
-                var clubs = [];
                 var roles = [];
+                var clubs = [];
+                var missingRoles = [];
+                var missingReasons = [];
 
                 // query Google Sheets
                 const queryResult = (await sheets.get("Main!A:H", env.GOOGLE_SHEET_ID, env)).slice(1);
@@ -617,6 +619,13 @@ export async function handleDiscordUpdate(env: Env, ctx: ExecutionContext) {
                 // record club roles from query result
                 for (const row of queryResult) {
                     if (row[5] != "In The Discord") {
+                        console.log(row);
+                        if (row?.[6]) {
+                            missingRoles.push(row[6]);
+                            missingReasons.push(row[5]);
+                            console.log(missingRoles);
+                            console.log(missingReasons);
+                        }
                         clubs.push(null);
                         roles.push(null);
                         continue;
@@ -677,10 +686,10 @@ export async function handleDiscordUpdate(env: Env, ctx: ExecutionContext) {
                     if (roles[j]) {
                         text += ` <@&${roles[j]}>`;
                     } else {
-                        text += ` [MISSING ROLE]`;
+                        text += ` [MISSING DISCORD ROLE]`;
                     }
                     if (!row?.[1]) {
-                        text += ` [MISSING CLUB]`;
+                        text += ` [MISSING SCHOOL NAME]`;
                     } else if (!row[3]) {
                         text += ` ${row[1]}`;
                         if (row[2]) {text += ` - ${row[2]}`;}
@@ -702,11 +711,18 @@ export async function handleDiscordUpdate(env: Env, ctx: ExecutionContext) {
                     text += "\n";
                     i++;
                 }
+                const clubsInDiscord = i - 1;
                 for (const roleID of clubRoles) {
-                    text += `${i}. <@&${roleID}> [MISSING CLUB]\n`;
+                    text += `${i}. <@&${roleID}> `;
+                    if (missingRoles.includes(roleID)) {
+                        const missingReason = missingReasons[missingRoles.indexOf(roleID)];
+                        text += `[${missingReason}]\n`
+                    } else {
+                        text += "[Missing From Club List]\n"
+                    }
                     i++;
                 }
-                text += `\n**GAME DEV CLUB CLUB CLUB LIST - ${i - 1} clubs and counting B)**\n\n**Use /club to get your club's role!**`;
+                text += `\n**GAME DEV CLUB CLUB CLUB LIST - ${clubsInDiscord} clubs and counting B)**\n\n**Use /club to get your club's role!**`;
                 text += error;
 
                 // split text into messages
