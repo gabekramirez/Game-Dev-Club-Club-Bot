@@ -1,4 +1,4 @@
-import type {Env, ExecutionContext} from "./type-hints.ts";
+import type {BotError, Env, ExecutionContext} from "./type-hints.ts";
 import * as discord from "./discord.ts";
 import * as sheets from "./sheets.ts";
 
@@ -764,7 +764,10 @@ export async function handleDiscordUpdate(env: Env, ctx: ExecutionContext) {
                     editsLeft--;
                 }
             } catch (err) {
-                await discord.sendMessage("Bot error: " + String(err), env.DISCORD_CLUB_LIST_CHANNEL_ID, env);
+                const botError = err as BotError;
+                if (botError.code != 503) {  // 503 The service is currently unavailable. (Cloudflare rate limiting?)
+                    await discord.sendMessage("Bot error: " + String(err), env.DISCORD_CLUB_LIST_CHANNEL_ID, env);
+                }
             }
         })());
     }

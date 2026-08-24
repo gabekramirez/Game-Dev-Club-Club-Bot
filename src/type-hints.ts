@@ -21,3 +21,7 @@ export interface ScheduledController {
     scheduledTime: number;
     cron: string;
 }
+
+export interface BotError {
+    code: number;
+}
