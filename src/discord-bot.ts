@@ -765,7 +765,7 @@ export async function handleDiscordUpdate(env: Env, ctx: ExecutionContext) {
                 }
             } catch (err) {
                 const botError = err as BotError;
-                if (botError.code != 503) {  // 503 The service is currently unavailable. (Cloudflare rate limiting?)
+                if (botError.error.code != 503) {  // 503 The service is currently unavailable. (Cloudflare rate limiting?)
                     await discord.sendMessage("Bot error: " + String(err), env.DISCORD_CLUB_LIST_CHANNEL_ID, env);
                 }
             }

@@ -23,5 +23,9 @@ export interface ScheduledController {
 }
 
 export interface BotError {
-    code: number;
+    error: {
+        code: number;
+        message: string;
+        status: string;
+    };
 }
